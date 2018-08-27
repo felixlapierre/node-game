@@ -82,9 +82,10 @@ socket.on('state', function(players) {
 	}
 
 	if(map != undefined) {
-		for(var i = 0; i < map.length; i++) {
-			var obj = map[i];
-			context.drawImage(tileStone1, 0, 0, 50, 50, obj[0], obj[1], 50, 50)
+		console.log(map);
+		for(var i = 0; i < map.tiles.length; i++) {
+			var obj = map.tiles[i];
+			context.drawImage(tileStone1, 0, 0, 50, 50, obj[2], obj[3], 50, 50)
 		}
 	}
 });

@@ -26,47 +26,54 @@ server.listen(portNumber, function() {
 	console.log('Starting server on port ' + portNumber);
 });
 
-//Add the WebSocket handlers
 var players = {};
-var map = [
-	[0,0],
-	[300,400],
-	[300,500]
-];
 
-io.on('connection', function(socket) {
+//Testing map module
+var map;
 
-	socket.on('new player', function() {
-		players[socket.id] = {
-			x: 300,
-			y: 300,
-			angle: 0
-		};
+map.load("./maps/map1.txt", finishLoadingMap);
 
-		//Send the player the map data
-		io.sockets.connected[socket.id].emit('mapdata', map);
-		console.log("I should have sent the map data!");
+function finishLoadingMap(data) {
+	map = data;
+	addWebSocketHandlers();
+}
+
+//Add the WebSocket handlers
+function addWebSocketHandlers() {
+	io.on('connection', function(socket) {
+		socket.on('new player', function() {
+			players[socket.id] = {
+				x: 300,
+				y: 300,
+				angle: 0
+			};
+
+			//Send the player the map data
+			io.sockets.connected[socket.id].emit('mapdata', map);
+			console.log("I should have sent the map data!");
+			console.log(map);
+		});
+
+		socket.on('movement', function(data) {
+			var player = players[socket.id] || {};
+			if(data.left) {player.x -= 5;}
+			if(data.up) {player.y -= 5;}
+			if(data.right) {player.x += 5;}
+			if(data.down) {player.y += 5;}
+			var deltaY = data.mouseY - player.y;
+			var deltaX = data.mouseX - player.x;
+
+			player.angle = Math.atan(deltaY/deltaX);
+			if (deltaX < 0) {
+				player.angle += Math.PI;
+			}
+		});
+
+		socket.on('disconnect', function() {
+			delete players[socket.id];
+		});
 	});
-
-	socket.on('movement', function(data) {
-		var player = players[socket.id] || {};
-		if(data.left) {player.x -= 5;}
-		if(data.up) {player.y -= 5;}
-		if(data.right) {player.x += 5;}
-		if(data.down) {player.y += 5;}
-		var deltaY = data.mouseY - player.y;
-		var deltaX = data.mouseX - player.x;
-
-		player.angle = Math.atan(deltaY/deltaX);
-		if (deltaX < 0) {
-			player.angle += Math.PI;
-		}
-	});
-
-	socket.on('disconnect', function() {
-		delete players[socket.id];
-	});
-});
+};
 
 setInterval(function() {
 	io.sockets.emit('state', players);

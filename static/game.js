@@ -81,7 +81,6 @@ socket.on('state', function(players) {
 		context.restore();
 	}
 
-	//The following line is not jazzing it right
 	if(map != undefined) {
 		for(var i = 0; i < map.length; i++) {
 			var obj = map[i];

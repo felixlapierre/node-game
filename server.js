@@ -26,7 +26,7 @@ server.listen(portNumber, function() {
 //Add the WebSocket handlers
 var players = {};
 var map = [
-	[100,20],
+	[0,0],
 	[300,400],
 	[300,500]
 ];

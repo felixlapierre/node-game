@@ -13,6 +13,7 @@ const TILE_SIZE = 50;
       else { // if wider than tall, shift vertically
         coordinates.y=(player.y+(player.y-obstacle.y));
       }
+    }
     return coordinates;
   }//end of function
-module.exports = collide;
+module.exports.wall_collide = collide;

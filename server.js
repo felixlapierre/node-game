@@ -30,13 +30,17 @@ var players = {};
 
 //Testing map module
 var textureMap;
+var wallMap;
 
-map.load("./maps/map1.txt", finishLoadingMap);
-
-function finishLoadingMap(data) {
+map.loadTextureMap("./maps/map1.txt", function(data) {
 	textureMap = data;
 	addWebSocketHandlers();
-}
+});
+
+map.loadWallMap("./maps/map1_walls.txt", function(data) {
+	wallMap = data;
+	console.log(wallMap);
+});
 
 //Add the WebSocket handlers
 function addWebSocketHandlers() {

@@ -4,6 +4,9 @@ var http = require('http');
 var path = require('path');
 var socketIO = require('socket.io');
 
+//My module Dependencies
+var map = require('./my_modules/my_map.js');
+
 var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
@@ -30,6 +33,7 @@ var map = [
 	[300,400],
 	[300,500]
 ];
+
 io.on('connection', function(socket) {
 
 	socket.on('new player', function() {

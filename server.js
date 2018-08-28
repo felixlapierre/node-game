@@ -29,12 +29,12 @@ server.listen(portNumber, function() {
 var players = {};
 
 //Testing map module
-var map;
+var textureMap;
 
 map.load("./maps/map1.txt", finishLoadingMap);
 
 function finishLoadingMap(data) {
-	map = data;
+	textureMap = data;
 	addWebSocketHandlers();
 }
 
@@ -49,9 +49,9 @@ function addWebSocketHandlers() {
 			};
 
 			//Send the player the map data
-			io.sockets.connected[socket.id].emit('mapdata', map);
+			io.sockets.connected[socket.id].emit('mapdata', textureMap);
 			console.log("I should have sent the map data!");
-			console.log(map);
+			console.log(textureMap);
 		});
 
 		socket.on('movement', function(data) {
@@ -60,6 +60,7 @@ function addWebSocketHandlers() {
 			if(data.up) {player.y -= 5;}
 			if(data.right) {player.x += 5;}
 			if(data.down) {player.y += 5;}
+
 			var deltaY = data.mouseY - player.y;
 			var deltaX = data.mouseX - player.x;
 

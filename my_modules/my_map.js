@@ -31,9 +31,17 @@ function convertToObject(data) {
   //The rest of the file contains the map data
   returned.tiles = [];
   for(var i = 2; i < rows.length; i++) {
-    returned.tiles.push(rows[i].split(" ").map(function(item) {
+    var tileData = rows[i].split(" ").map(function(item) {
       return parseInt(item, 10);
-    }));
+    });
+    returned.tiles.push({
+      sourceX: tileData[0],
+      sourceY: tileData[1],
+      destX0: tileData[2],
+      destY0: tileData[3],
+      destX1: tileData[4],
+      destY1: tileData[5]
+    });
   }
   return returned;
 }

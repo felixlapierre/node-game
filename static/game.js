@@ -1,4 +1,5 @@
 var socket = io();
+const tileSize = 50;
 
 var movement = {
 	up: false,
@@ -13,34 +14,34 @@ var movement = {
 document.addEventListener('keydown', function(event) {
 	switch(event.keyCode) {
 		case 65: //A
-			movement.left = true;
-			break;
+		movement.left = true;
+		break;
 		case 87: //W
-			movement.up = true;
-			break;
+		movement.up = true;
+		break;
 		case 68: //D
-			movement.right = true;
-			break;
+		movement.right = true;
+		break;
 		case 83: //S
-			movement.down = true;
-			break;
+		movement.down = true;
+		break;
 	}
 });
 
 document.addEventListener('keyup', function(event) {
 	switch(event.keyCode) {
 		case 65: //A
-			movement.left = false;
-			break;
+		movement.left = false;
+		break;
 		case 87: //W
-			movement.up = false;
-			break;
+		movement.up = false;
+		break;
 		case 68: //D
-			movement.right = false;
-			break;
+		movement.right = false;
+		break;
 		case 83: //S
-			movement.down = false;
-			break;
+		movement.down = false;
+		break;
 	}
 });
 
@@ -68,9 +69,23 @@ playerImage.src = "static/playerSprite1.png";
 var tileStone1 = new Image();
 tileStone1.src = "static/TileStone1.png";
 
+var spritesheet = new Image();
+
 socket.on('state', function(players) {
 	context.clearRect(0, 0, 800, 600);
 	context.fillStyle = 'green';
+
+	if(map != undefined && spritesheet.src != undefined) {
+		for(var i = 0; i < map.tiles.length; i++) {
+			var tile = map.tiles[i];
+			for(var x = tile.destX0; x <= tile.destX1; x += tileSize) {
+				for(var y = tile.destY0; y <= tile.destY1; y += tileSize) {
+					context.drawImage(spritesheet, tile.sourceX, tile.sourceY, 50, 50,
+						x, y, 50, 50);
+					}
+				}
+			}
+		}
 
 	for(var id in players) {
 		var player = players[id];
@@ -81,15 +96,10 @@ socket.on('state', function(players) {
 		context.restore();
 	}
 
-	if(map != undefined) {
-		console.log(map);
-		for(var i = 0; i < map.tiles.length; i++) {
-			var obj = map.tiles[i];
-			context.drawImage(tileStone1, 0, 0, 50, 50, obj[2], obj[3], 50, 50)
-		}
-	}
-});
 
-socket.on('mapdata', function(data) {
-	map = data;
-});
+	});
+
+	socket.on('mapdata', function(data) {
+		map = data;
+		spritesheet.src = "static/" + data.spritesheet;
+	});

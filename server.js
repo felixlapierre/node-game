@@ -64,7 +64,7 @@ function addWebSocketHandlers() {
 			if(data.right) {player.x += 5;}
 			if(data.down) {player.y += 5;}
 
-		// collision checks
+			// collision checks
 			var updatedCoord= collision.boundsCheck(player.x, player.y, wallMap.bounds);
 			player.x = updatedCoord.x;
 			player.y = updatedCoord.y;

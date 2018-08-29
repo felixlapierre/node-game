@@ -68,7 +68,7 @@ function addWebSocketHandlers() {
 			var updatedCoord= collision.boundsCheck(player.x, player.y, wallMap.bounds);
 			player.x = updatedCoord.x;
 			player.y = updatedCoord.y;
-			updatedCoord = collision.wallCheck(wallMap,player.x, player.y);
+			updatedCoord = collision.wallCheck(wallMap.tiles,player.x, player.y);
 			player.x = updatedCoord.x;
 			player.y = updatedCoord.y;
 

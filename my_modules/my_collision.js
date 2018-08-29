@@ -31,7 +31,6 @@ returns new coordinates of player
 
 function wallCheck(wallMap, playerX, playerY){
 
-
   var coordinates= {
     x: playerX,
     y: playerY
@@ -51,6 +50,8 @@ function wallCheck(wallMap, playerX, playerY){
       }
       return coordinates;
     }
+  }
+}
     module.exports.wallCheck = wallCheck;
 
     /*

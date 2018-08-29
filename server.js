@@ -39,7 +39,6 @@ map.loadTextureMap("./maps/map1.txt", function(data) {
 
 map.loadWallMap("./maps/map1_walls.txt", function(data) {
 	wallMap = data;
-	console.log(wallMap);
 });
 
 //Add the WebSocket handlers
@@ -54,8 +53,7 @@ function addWebSocketHandlers() {
 
 			//Send the player the map data
 			io.sockets.connected[socket.id].emit('mapdata', textureMap);
-			console.log("I should have sent the map data!");
-			console.log(textureMap);
+			console.log("Sending map data to " + socket.id);
 		});
 
 		socket.on('movement', function(data) {

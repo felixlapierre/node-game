@@ -30,13 +30,16 @@ var players = {};
 
 //Testing map module
 var textureMap;
+var wallMap;
 
-map.load("./maps/map1.txt", finishLoadingMap);
-
-function finishLoadingMap(data) {
+map.loadTextureMap("./maps/map1.txt", function(data) {
 	textureMap = data;
 	addWebSocketHandlers();
-}
+});
+
+map.loadWallMap("./maps/map1_walls.txt", function(data) {
+	wallMap = data;
+});
 
 //Add the WebSocket handlers
 function addWebSocketHandlers() {
@@ -50,8 +53,7 @@ function addWebSocketHandlers() {
 
 			//Send the player the map data
 			io.sockets.connected[socket.id].emit('mapdata', textureMap);
-			console.log("I should have sent the map data!");
-			console.log(textureMap);
+			console.log("Sending map data to " + socket.id);
 		});
 
 		socket.on('movement', function(data) {
@@ -61,13 +63,9 @@ function addWebSocketHandlers() {
 			if(data.right) {player.x += 5;}
 			if(data.down) {player.y += 5;}
 
-			var deltaY = data.mouseY - player.y;
-			var deltaX = data.mouseX - player.x;
+			player.angle = data.angle;
 
-			player.angle = Math.atan(deltaY/deltaX);
-			if (deltaX < 0) {
-				player.angle += Math.PI;
-			}
+			io.sockets.connected[socket.id].emit('updateCenter', {x:player.x, y:player.y});
 		});
 
 		socket.on('disconnect', function() {

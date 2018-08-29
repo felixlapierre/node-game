@@ -14,7 +14,7 @@ const TILE_SIZE = 50;
       }
       else { // if wider than tall, shift vertically
         console.log("vert shift");
-                console.log(playerY-obstacleY);
+        console.log(playerY-obstacleY);
         coordinates.y=(playerY+(playerY-obstacleY));
       }
     }
@@ -30,7 +30,9 @@ const TILE_SIZE = 50;
 */
 
   function collisionCheck(wallMap, playerX, playerY){
+console.log("player.x value");
 console.log(playerX);
+console.log("player.y value");
 console.log(playerY);
 
     var coordinates= {

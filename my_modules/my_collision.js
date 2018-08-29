@@ -32,7 +32,7 @@ const TILE_SIZE = 50;
   function collisionCheck(wallMap, playerX, playerY){
 console.log(playerX);
 console.log(playerY);
-console.log(wallMap);
+
     var coordinates= {
       x: playerX,
       y: playerY

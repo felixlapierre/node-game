@@ -30,11 +30,15 @@ const TILE_SIZE = 50;
 */
 
   function collisionCheck(wallMap, playerX, playerY){
-
+console.log(playerX);
+console.log(playerY);
+console.log(wallMap);
     var coordinates= {
       x: playerX,
       y: playerY
     };
+/*console.log(parseInt(playerX/TILE_SIZE));
+console.log(parseInt(playerY/TILE_SIZE));*/
 
     var playerLocation = {
       x: parseInt(playerX/TILE_SIZE),
@@ -47,11 +51,12 @@ const TILE_SIZE = 50;
     };
     var mapbox = [playerLocation];
 
+
 //Determine which 4 locations to be checked for walls
-console.log("box of player");
+/*console.log("box of player");
   console.log(mapbox[0].x);
     console.log(mapbox[0].y);
-    console.log();
+    console.log();*/
     if (quadrantInfo.x<25){ // player in left
       //check top left
       if (quadrantInfo.y<=25){
@@ -82,23 +87,22 @@ console.log("box of player");
       }
 
     }
-    else{
-      console.log("update coordinates");
-      console.log(coordinates);
-      return;
+    else{ //player is in middle
+      return coordinates;
     }
 
 //check boxes for walls
     for (var i=0; i<4; i++){
+      console.log(i);
+      console.log(mapbox[i].x );
+      console.log(mapbox[i].y );
       if (wallMap[ mapbox[i].x ][ mapbox[i].y ]==1){
-        console.log("map box");
-        console.log(mapbox[i].x );
-        console.log(mapbox[i].y);
-        console.log( wallCollide(playerX, playerY, ((playerLocation.x*TILE_SIZE)+25), ((playerLocation.y*TILE_SIZE)+25)));
+        return( wallCollide(playerX, playerY, ((playerLocation.x*TILE_SIZE)+25), ((playerLocation.y*TILE_SIZE)+25)));
       }
     }
+    return coordinates;
   }
-  module.exports.collisionCheck = collisionCheck;
+  module.exports.wallCheck = collisionCheck;
 
 /*
   boundsCollision
@@ -106,7 +110,6 @@ console.log("box of player");
 */
   function boundsCollision(playerX, playerY, bounds){
     var coordinates= {x: playerX, y: playerY};
-
 // check horizontal
       if (playerX<25){
         coordinates.x=25;
@@ -122,4 +125,4 @@ console.log("box of player");
       }
       return coordinates;
   }
-  module.exports.boundsCollision = boundsCollision;
+  module.exports.boundsCheck = boundsCollision;

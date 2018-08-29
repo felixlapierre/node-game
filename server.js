@@ -65,13 +65,9 @@ function addWebSocketHandlers() {
 			if(data.right) {player.x += 5;}
 			if(data.down) {player.y += 5;}
 
-			var deltaY = data.mouseY - player.y;
-			var deltaX = data.mouseX - player.x;
+			player.angle = data.angle;
 
-			player.angle = Math.atan(deltaY/deltaX);
-			if (deltaX < 0) {
-				player.angle += Math.PI;
-			}
+			io.sockets.connected[socket.id].emit('updateCenter', {x:player.x, y:player.y});
 		});
 
 		socket.on('disconnect', function() {

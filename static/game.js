@@ -1,13 +1,21 @@
 var socket = io();
 const tileSize = 50;
+var topleft = {
+	x:0,
+	y:0
+}
 
 var movement = {
 	up: false,
 	down: false,
 	left: false,
 	right: false,
-	mouseX: 0,
-	mouseY: 0
+	angle:0
+}
+
+var mouse = {
+	x:0,
+	y:0
 }
 
 //Keyboard event listeners
@@ -46,16 +54,27 @@ document.addEventListener('keyup', function(event) {
 });
 
 document.addEventListener('mousemove', function(event) {
-	movement.mouseX = event.clientX - canvas.offsetLeft;
-	movement.mouseY = event.clientY - canvas.offsetTop;
+	mouse.x = event.clientX - canvas.offsetLeft;
+	mouse.y = event.clientY - canvas.offsetTop;
 }, false);
 
 var map = undefined;
 socket.emit('new player');
 
 setInterval(function() {
+	calculateAngle();
 	socket.emit('movement', movement);
 }, 1000 / 60);
+
+function calculateAngle() {
+	var deltaX = mouse.x - canvas.width / 2;
+	var deltaY = mouse.y - canvas.height / 2;
+
+	movement.angle = Math.atan(deltaY/deltaX);
+	if(deltaX < 0) {
+		movement.angle += Math.PI;
+	}
+}
 
 var canvas = document.getElementById('canvas');
 
@@ -81,25 +100,29 @@ socket.on('state', function(players) {
 			for(var x = tile.destX0; x <= tile.destX1; x += tileSize) {
 				for(var y = tile.destY0; y <= tile.destY1; y += tileSize) {
 					context.drawImage(spritesheet, tile.sourceX, tile.sourceY, 50, 50,
-						x, y, 50, 50);
+						x - topleft.x, y - topleft.y, 50, 50);
 					}
 				}
 			}
 		}
 
-	for(var id in players) {
-		var player = players[id];
-		context.save();
-		context.translate(player.x, player.y);
-		context.rotate(player.angle + Math.PI / 2);
-		context.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
-		context.restore();
-	}
-
-
+		for(var id in players) {
+			var player = players[id];
+			context.save();
+			//TODO: Implement the screen offset
+			context.translate(player.x - topleft.x, player.y - topleft.y);
+			context.rotate(player.angle + Math.PI / 2);
+			context.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
+			context.restore();
+		}
 	});
 
-	socket.on('mapdata', function(data) {
-		map = data;
-		spritesheet.src = "static/" + data.spritesheet;
-	});
+socket.on('mapdata', function(data) {
+	map = data;
+	spritesheet.src = "static/" + data.spritesheet;
+});
+
+socket.on('updateCenter', function(data) {
+	topleft.x = data.x - canvas.width / 2;
+	topleft.y = data.y - canvas.height / 2;
+});

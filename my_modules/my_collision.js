@@ -1,7 +1,9 @@
 const TILE_SIZE = 50;
 const HALF_TILE = 25;
-/*collide
-returns an object containing the x-y coordinates of player AFTER collision resolution
+/*
+    Wall Collide
+    determines how collision will be resolved (horiz vs vert)
+    returns new coordinates of player
 */
 function wallCollide(playerX, playerY, obstacleX, obstacleY) {
   console.log('player x: '+ playerX);
@@ -9,14 +11,18 @@ function wallCollide(playerX, playerY, obstacleX, obstacleY) {
   console.log('obstacle x: '+ obstacleX);
   console.log('obstacle y: '+ obstacleY);
   console.log();
+
   var coordinates= {x: playerX, y: playerY};
-    //if left bound of player is beyond right bound of obstacle
-  if ((playerX-HALF_TILE)>(obstacleX+HALF_TILE)){
-  coordinates.x = obstacleX+TILE_SIZE;
-  }
-  if ((playerX+HALF_TILE)>(obstacleX-HALF_TILE)){
-  coordinates.x = obstacleX-TILE_SIZE;
-  }
+console.log('coordinates: ');
+console.log(coordinates);
+  if((playerX+TILE_SIZE)>obstacleX){ coordinates.y= obstacleY-HALF_TILE;  }
+
+  else if(playerX<(obstacleX+TILE_SIZE)){  coordinates.y= obstacleX+HALF_TILE;}
+
+  else if((playerY+TILE_SIZE)>obstacleY){ coordinates.x= obstacleX-HALF_TILE;}
+
+  else if(playerY<(obstacleY+TILE_SIZE)){coordinates.x= obstacleX+HALF_TILE;  }
+
   /*if ((Math.abs(playerX-obstacleX)<TILE_SIZE)|| (Math.abs(playerY-obstacleY)<TILE_SIZE)){
   // wider
   if (Math.abs(playerX-obstacleX)>Math.abs(playerY-obstacleY)){
@@ -30,36 +36,36 @@ console.log(playerY-obstacleY);
 coordinates.y=(playerY+(playerY-obstacleY));
 }
 }*/
-
+console.log('coordinates: ');
+console.log(coordinates);
+console.log();
 return coordinates;
 }//end of function
 
 
 /*
-Collision check
-Uses player location to determine which locations on wallMap to check
-If collision, invoke wallCollide
+ Wall check
+Determine which tiles to check based on player location
+checks tiles for walls and invokes collision if necessary
 returns new coordinates of player
 */
 
-function wallCheck(wallMap, playerX, playerY){
+function wallCheck(tiles, playerX, playerY){
 
   var coordinates= {
     x: playerX,
     y: playerY
   };
 
-
   var playerTile = {
     x: parseInt( (playerX-HALF_TILE)/TILE_SIZE),
     y: parseInt( (playerY-HALF_TILE)/TILE_SIZE)
   };
 
-  //check boxes for walls
   for (var i=0; i<1; i++){
     for (var j=0; j<1; j++){
-      if (wallMap[playerTile.x+i][playerTile.y+j]==1){
-        return(  wallCollide( playerX, playerY, ( ((playerTile.x+i)*TILE_SIZE)), ( ((playerTile.y+j)*TILE_SIZE)) )  );
+      if (tiles[playerTile.x+i][playerTile.y+j]==1){
+        return(  wallCollide( playerX-HALF_TILE , playerY-HALF_TILE, ( playerTile.x+i)*TILE_SIZE, ( playerTile.y+j)*TILE_SIZE ));
       }
       return coordinates;
     }

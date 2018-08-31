@@ -25,32 +25,39 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
   if(!areas.hasOwnProperty(areaID)) {
     //Create the new area
     areas[areaID] = {
-      players : {},
+      players : {
+      },
       loaded: false,
       textureMap: undefined,
       wallMap: undefined
     }
+    areas[areaID].players[socket.id] = {
+      //TODO: Remove placeholder values
+      x:300,
+      y:300,
+      angle:0
+    }
     //TODO: Load maps
 
     //NOTE: this might be incorrect pathing
-    map.loadTextureMap("../maps/" + areaID + ".txt", function(data) {
+    map.loadTextureMap("./maps/" + areaID + ".txt", function(data) {
       areas[areaID].textureMap = data;
-      map.loadWallMap("../maps/" + areaID + "_walls.txt", function(data) {
+      map.loadWallMap("./maps/" + areaID + "_walls.txt", function(data) {
         areas[areaID].wallMap = data;
         areas[areaID].loaded = true;
         //Give the map to everyone in the room
-        callToDeliverMap(socket.id);
         for(var player in areas[areaID].players) {
           callToDeliverMap(player);
         }
       });
     });
-  }
-  areas[areaID].players[socket.id] = {
-    //TODO: Remove placeholder values
-    x:300,
-    y:300,
-    angle:0
+  } else {
+    areas[areaID].players[socket.id] = {
+      //TODO: Remove placeholder values
+      x:300,
+      y:300,
+      angle:0
+    }
   }
   if(areas[areaID].loaded) {
     callToDeliverMap(socket.id);
@@ -70,7 +77,14 @@ function removePlayer(socketID) {
   delete socket_rooms[socketID];
 }
 
+function forEachAreaID(callback) {
+  for(var areaID in areas) {
+    callback(areaID);
+  }
+}
+
 exports.moveSocketTo = moveSocketTo;
 exports.getAreaOfSocketID = getAreaOfSocketID;
 exports.getAreaByID = getAreaByID;
 exports.removePlayer = removePlayer;
+exports.forEachAreaID = forEachAreaID;

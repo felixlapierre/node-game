@@ -5,7 +5,6 @@ const path = require('path');
 const socketIO = require('socket.io');
 
 //My module Dependencies
-const map = require('./my_modules/my_map.js');
 const collision = require('./my_modules/my_collision.js');
 const areas = require('./my_modules/my_areas.js');
 
@@ -31,19 +30,23 @@ server.listen(portNumber, function() {
 //Add the WebSocket handlers
 io.on('connection', function(socket) {
 	socket.on('new player', function() {
-		areas.moveSocketTo(socket, 'default', function(socketID) {
-			//Send the player the map data
-			io.sockets.connected[socket.id].emit('mapdata', areas);
-			console.log("Sending map data to " + socket.id);
-		});
+		newPlayer(socket);
 	});
 
 	socket.on('movement', function(data) {
 		var currentArea = areas.getAreaOfSocketID(socket.id);
+		if(currentArea == undefined) {
+			//Player is not registered as being in an area
+			newPlayer(socket);
+			return;
+		}
 		var player = currentArea.players[socket.id] || {};
 
-		if(currentArea.loaded == false)
+		if(currentArea.loaded == false) {
+			//NOTE: Debug statement
+			console.log("Current area not loaded.");
 			return;
+		}
 
 		if(data.left) {player.x -= 5;}
 		if(data.up) {player.y -= 5;}
@@ -69,9 +72,16 @@ io.on('connection', function(socket) {
 	});
 });
 
+function newPlayer(socket) {
+	areas.moveSocketTo(socket, 'default', function(socketID) {
+		//Send the player the map data
+		io.sockets.connected[socket.id].emit('mapdata', areas.getAreaOfSocketID(socketID).textureMap);
+		console.log("Sent map data to " + socket.id);
+	});
+}
 
 setInterval(function() {
-	for(var room in areas) {
-			io.to(room).emit('state', areas[room].players);
-	}
+	areas.forEachAreaID(function(areaID) {
+		io.to(areaID).emit('state', areas.getAreaByID(areaID).players);
+	});
 }, 1000 / 60);

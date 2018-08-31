@@ -1,67 +1,70 @@
 const TILE_SIZE = 50;
-const HALF_TILE = 25;
-/*
-Wall Collide
-determines how collision will be resolved (horiz vs vert)
-returns new coordinates of player
+/*collide
+returns an object containing the x-y coordinates of player AFTER collision resolution
 */
 function wallCollide(playerX, playerY, obstacleX, obstacleY) {
-  console.log('player x: '+ playerX);
-  console.log('player y: '+ playerY);
-  console.log('obstacle x: '+ obstacleX);
-  console.log('obstacle y: '+ obstacleY);
-  console.log();
+  var newLocation = {x: playerX, y: playerY};
+  var deltaX = playerX - obstacleX;
+  var deltaY = playerY - obstacleY;
 
-  var coordinates= {x: playerX, y: playerY};
-  console.log('coordinates: ');
-  console.log(coordinates);
-
-  if ((Math.abs(playerX-obstacleX)<TILE_SIZE)|| (Math.abs(playerY-obstacleY)<TILE_SIZE)){
-    // wider
-    if (Math.abs(playerX-obstacleX)>Math.abs(playerY-obstacleY)){
-      console.log('horiz shift'+ (playerX-obstacleX));
-      console.log(playerX-obstacleX);
-      coordinates.x=(playerX+(playerX-obstacleX));
+  //Check if collision is occuring
+  if ((Math.abs(deltaX)<TILE_SIZE)&& (Math.abs(deltaY)<TILE_SIZE)){
+    //DeltaX bigger: horizontal shift
+    if (Math.abs(deltaX)>Math.abs(deltaY)){
+      //DeltaX positive: shift right
+      if(deltaX > 0) {
+        newLocation.x = obstacleX + 50;
+      //DeltaX negative: shift left
+      } else {
+        newLocation.x = obstacleX - 50;
+      }
     }
-    else if(Math.abs(playerX-obstacleX)<Math.abs(playerY-obstacleY)){ // if wider than tall, shift vertically
-      console.log('vert shift'+ (playerY-obstacleY));
-      coordinates.y=(playerY+(playerY-obstacleY));
+    //DeltaY bigger: vertical shift
+    else {
+      //DeltaY positive: shift downwards
+      if(deltaY > 0) {
+        newLocation.y = obstacleY + 50;
+
+      //DeltaY negative: shift upwards
+      } else {
+        newLocation.y = obstacleY - 50;
+      }
     }
   }
-  console.log('coordinates: ');
-  console.log(coordinates);
-  console.log();
-  return coordinates;
+  return newLocation;
 }//end of function
 
 
 /*
-Wall check
-Determine which tiles to check based on player location
-checks tiles for walls and invokes collision if necessary
+Collision check
+Uses player location to determine which locations on wallMap to check
+If collision, invoke wallCollide
 returns new coordinates of player
 */
 
-function wallCheck(tiles, playerX, playerY){
+function wallCheck(wallMap, playerX, playerY){
 
-  var coordinates= {
+  var newLocation = {
     x: playerX,
     y: playerY
   };
 
+
   var playerTile = {
-    x: parseInt( (playerX-HALF_TILE)/TILE_SIZE),
-    y: parseInt( (playerY-HALF_TILE)/TILE_SIZE)
+    x: parseInt( (playerX-25)/TILE_SIZE),
+    y: parseInt( (playerY-25)/TILE_SIZE)
   };
 
-  for (var i=0; i<2; i++){
-    for (var j=0; j<2; j++){
-      if (tiles[playerTile.x+i][playerTile.y+j]==1){
-        return(  wallCollide( playerX-HALF_TILE , playerY-HALF_TILE, ( playerTile.x+i)*TILE_SIZE, ( playerTile.y+j)*TILE_SIZE ));
+  //check boxes for walls
+  for (var i=0; i<=1; i++){
+    for (var j=0; j<=1; j++){
+      if (wallMap[playerTile.x+i][playerTile.y+j]==1){
+        //Pass newlocation data to take into account a previously checked tile's collision resolution
+        newLocation = wallCollide(newLocation.x, newLocation.y, ((playerTile.x + i)*TILE_SIZE) + 25, ((playerTile.y + j)*TILE_SIZE) +25);
       }
-      return coordinates;
     }
   }
+  return newLocation;
 }
 module.exports.wallCheck = wallCheck;
 
@@ -72,17 +75,17 @@ checks if player is out of bounds. If out of bounds, player is pushed to closest
 function boundsCheck(playerX, playerY, bounds){
   var coordinates= {x: playerX, y: playerY};
   // check horizontal
-  if (playerX<HALF_TILE){
-    coordinates.x=HALF_TILE;
-  }else if (playerX>(bounds.x-HALF_TILE)){
-    coordinates.x=(bounds.x-HALF_TILE);
+  if (playerX<25){
+    coordinates.x=25;
+  }else if (playerX>(bounds.x-25)){
+    coordinates.x=(bounds.x-25);
   }
   // check vertical
-  if(playerY<HALF_TILE){
-    coordinates.y = HALF_TILE;
+  if(playerY<25){
+    coordinates.y = 25;
   }
-  else if(playerY>(bounds.y-HALF_TILE)){
-    coordinates.y = (bounds.y-HALF_TILE);
+  else if(playerY>(bounds.y-25)){
+    coordinates.y = (bounds.y-25);
   }
   return coordinates;
 }

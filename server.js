@@ -40,6 +40,7 @@ map.loadTextureMap("./maps/map1.txt", function(data) {
 
 map.loadWallMap("./maps/map1_walls.txt", function(data) {
 	wallMap = data;
+	console.log(wallMap);
 });
 
 //Add the WebSocket handlers

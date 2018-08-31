@@ -1,12 +1,12 @@
 //Dependencies
-var express = require('express');
-var http = require('http');
-var path = require('path');
-var socketIO = require('socket.io');
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const socketIO = require('socket.io');
 
 //My module Dependencies
-var map = require('./my_modules/my_map.js');
 const collision = require('./my_modules/my_collision.js');
+const areas = require('./my_modules/my_areas.js');
 
 var app = express();
 var server = http.Server(app);
@@ -27,64 +27,61 @@ server.listen(portNumber, function() {
 	console.log('Starting server on port ' + portNumber);
 });
 
-var players = {};
-
-//Testing map module
-var textureMap;
-var wallMap;
-
-map.loadTextureMap("./maps/map1.txt", function(data) {
-	textureMap = data;
-	addWebSocketHandlers();
-});
-
-map.loadWallMap("./maps/map1_walls.txt", function(data) {
-	wallMap = data;
-	console.log(wallMap);
-});
-
 //Add the WebSocket handlers
-function addWebSocketHandlers() {
-	io.on('connection', function(socket) {
-		socket.on('new player', function() {
-			players[socket.id] = {
-				x: 300,
-				y: 300,
-				angle: 0
-			};
-
-			//Send the player the map data
-			io.sockets.connected[socket.id].emit('mapdata', textureMap);
-			console.log("Sending map data to " + socket.id);
-		});
-
-		socket.on('movement', function(data) {
-			var player = players[socket.id] || {};
-			if(data.left) {player.x -= 5;}
-			if(data.up) {player.y -= 5;}
-			if(data.right) {player.x += 5;}
-			if(data.down) {player.y += 5;}
-
-			// collision checks
-			var updatedCoord= collision.boundsCheck(player.x, player.y, wallMap.bounds);
-			player.x = updatedCoord.x;
-			player.y = updatedCoord.y;
-			updatedCoord = collision.wallCheck(wallMap.tiles,player.x, player.y);
-			player.x = updatedCoord.x;
-			player.y = updatedCoord.y;
-
-
-			player.angle = data.angle;
-
-			io.sockets.connected[socket.id].emit('updateCenter', {x:player.x, y:player.y});
-		});
-
-		socket.on('disconnect', function() {
-			delete players[socket.id];
-		});
+io.on('connection', function(socket) {
+	socket.on('new player', function() {
+		newPlayer(socket);
 	});
-};
+
+	socket.on('movement', function(data) {
+		var currentArea = areas.getAreaOfSocketID(socket.id);
+		if(currentArea == undefined) {
+			//Player is not registered as being in an area
+			newPlayer(socket);
+			return;
+		}
+		var player = currentArea.players[socket.id] || {};
+
+		if(currentArea.loaded == false) {
+			//NOTE: Debug statement
+			console.log("Current area not loaded.");
+			return;
+		}
+
+		if(data.left) {player.x -= 5;}
+		if(data.up) {player.y -= 5;}
+		if(data.right) {player.x += 5;}
+		if(data.down) {player.y += 5;}
+
+		// collision checks
+		var updatedCoord= collision.boundsCheck(player.x, player.y, currentArea.wallMap.bounds);
+		player.x = updatedCoord.x;
+		player.y = updatedCoord.y;
+		updatedCoord = collision.wallCheck(currentArea.wallMap.tiles,player.x, player.y);
+		player.x = updatedCoord.x;
+		player.y = updatedCoord.y;
+
+
+		player.angle = data.angle;
+
+		io.sockets.connected[socket.id].emit('updateCenter', {x:player.x, y:player.y});
+	});
+
+	socket.on('disconnect', function() {
+		areas.removePlayer(socket.id);
+	});
+});
+
+function newPlayer(socket) {
+	areas.moveSocketTo(socket, 'default', function(socketID) {
+		//Send the player the map data
+		io.sockets.connected[socket.id].emit('mapdata', areas.getAreaOfSocketID(socketID).textureMap);
+		console.log("Sent map data to " + socket.id);
+	});
+}
 
 setInterval(function() {
-	io.sockets.emit('state', players);
+	areas.forEachAreaID(function(areaID) {
+		io.to(areaID).emit('state', areas.getAreaByID(areaID).players);
+	});
 }, 1000 / 60);

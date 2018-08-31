@@ -1,12 +1,13 @@
 //Dependencies
-var express = require('express');
-var http = require('http');
-var path = require('path');
-var socketIO = require('socket.io');
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const socketIO = require('socket.io');
 
 //My module Dependencies
-var map = require('./my_modules/my_map.js');
+const map = require('./my_modules/my_map.js');
 const collision = require('./my_modules/my_collision.js');
+const areas = require('./my_modules/my_areas.js');
 
 var app = express();
 var server = http.Server(app);
@@ -40,7 +41,6 @@ map.loadTextureMap("./maps/map1.txt", function(data) {
 
 map.loadWallMap("./maps/map1_walls.txt", function(data) {
 	wallMap = data;
-	console.log(wallMap);
 });
 
 //Add the WebSocket handlers

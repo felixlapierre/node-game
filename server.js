@@ -28,63 +28,50 @@ server.listen(portNumber, function() {
 	console.log('Starting server on port ' + portNumber);
 });
 
-var players = {};
-
-//Testing map module
-var textureMap;
-var wallMap;
-
-map.loadTextureMap("./maps/map1.txt", function(data) {
-	textureMap = data;
-	addWebSocketHandlers();
-});
-
-map.loadWallMap("./maps/map1_walls.txt", function(data) {
-	wallMap = data;
-});
-
 //Add the WebSocket handlers
-function addWebSocketHandlers() {
-	io.on('connection', function(socket) {
-		socket.on('new player', function() {
-			players[socket.id] = {
-				x: 300,
-				y: 300,
-				angle: 0
-			};
-
+io.on('connection', function(socket) {
+	socket.on('new player', function() {
+		areas.moveSocketTo(socket, 'default', function(socketID) {
 			//Send the player the map data
-			io.sockets.connected[socket.id].emit('mapdata', textureMap);
+			io.sockets.connected[socket.id].emit('mapdata', areas);
 			console.log("Sending map data to " + socket.id);
 		});
-
-		socket.on('movement', function(data) {
-			var player = players[socket.id] || {};
-			if(data.left) {player.x -= 5;}
-			if(data.up) {player.y -= 5;}
-			if(data.right) {player.x += 5;}
-			if(data.down) {player.y += 5;}
-
-			// collision checks
-			var updatedCoord= collision.boundsCheck(player.x, player.y, wallMap.bounds);
-			player.x = updatedCoord.x;
-			player.y = updatedCoord.y;
-			updatedCoord = collision.wallCheck(wallMap.tiles,player.x, player.y);
-			player.x = updatedCoord.x;
-			player.y = updatedCoord.y;
-
-
-			player.angle = data.angle;
-
-			io.sockets.connected[socket.id].emit('updateCenter', {x:player.x, y:player.y});
-		});
-
-		socket.on('disconnect', function() {
-			delete players[socket.id];
-		});
 	});
-};
+
+	socket.on('movement', function(data) {
+		var currentArea = areas.getAreaOfSocketID(socket.id);
+		var player = currentArea.players[socket.id] || {};
+
+		if(currentArea.loaded == false)
+			return;
+
+		if(data.left) {player.x -= 5;}
+		if(data.up) {player.y -= 5;}
+		if(data.right) {player.x += 5;}
+		if(data.down) {player.y += 5;}
+
+		// collision checks
+		var updatedCoord= collision.boundsCheck(player.x, player.y, currentArea.wallMap.bounds);
+		player.x = updatedCoord.x;
+		player.y = updatedCoord.y;
+		updatedCoord = collision.wallCheck(currentArea.wallMap.tiles,player.x, player.y);
+		player.x = updatedCoord.x;
+		player.y = updatedCoord.y;
+
+
+		player.angle = data.angle;
+
+		io.sockets.connected[socket.id].emit('updateCenter', {x:player.x, y:player.y});
+	});
+
+	socket.on('disconnect', function() {
+		areas.removePlayer(socket.id);
+	});
+});
+
 
 setInterval(function() {
-	io.sockets.emit('state', players);
+	for(var room in areas) {
+			io.to(room).emit('state', areas[room].players);
+	}
 }, 1000 / 60);

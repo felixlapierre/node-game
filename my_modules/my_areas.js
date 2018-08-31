@@ -1,9 +1,9 @@
 var exports = module.exports = {};
-
+const map = require('./my_map.js');
 var areas = {};
 var socket_rooms = {};
 
-function moveSocketTo(socket, areaID) {
+function moveSocketTo(socket, areaID, callToDeliverMap) {
 
   var previousAreaID = socket_rooms[socket.id];
   if(previousAreaID != undefined) {
@@ -27,10 +27,24 @@ function moveSocketTo(socket, areaID) {
     areas[areaID] = {
       players : {},
       loaded: false,
-      tileMap: undefined,
+      textureMap: undefined,
       wallMap: undefined
     }
     //TODO: Load maps
+
+    //NOTE: this might be incorrect pathing
+    map.loadTextureMap("../maps/" + areaID + ".txt", function(data) {
+      areas[areaID].textureMap = data;
+      map.loadWallMap("../maps/" + areaID + "_walls.txt", function(data) {
+        areas[areaID].wallMap = data;
+        areas[areaID].loaded = true;
+        //Give the map to everyone in the room
+        callToDeliverMap(socket.id);
+        for(var player in areas[areaID].players) {
+          callToDeliverMap(player);
+        }
+      });
+    });
   }
   areas[areaID].players[socket.id] = {
     //TODO: Remove placeholder values
@@ -38,4 +52,25 @@ function moveSocketTo(socket, areaID) {
     y:300,
     angle:0
   }
+  if(areas[areaID].loaded) {
+    callToDeliverMap(socket.id);
+  }
 }
+
+function getAreaOfSocketID(socketID) {
+  return areas[socket_rooms[socketID]];
+}
+
+function getAreaByID(areaID) {
+  return areas[areaID];
+}
+
+function removePlayer(socketID) {
+  delete areas[socket_rooms[socketID]].players[socketID];
+  delete socket_rooms[socketID];
+}
+
+exports.moveSocketTo = moveSocketTo;
+exports.getAreaOfSocketID = getAreaOfSocketID;
+exports.getAreaByID = getAreaByID;
+exports.removePlayer = removePlayer;

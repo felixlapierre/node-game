@@ -6,6 +6,7 @@ var socketIO = require('socket.io');
 
 //My module Dependencies
 var map = require('./my_modules/my_map.js');
+const collision = require('./my_modules/my_collision.js');
 
 var app = express();
 var server = http.Server(app);
@@ -39,6 +40,7 @@ map.loadTextureMap("./maps/map1.txt", function(data) {
 
 map.loadWallMap("./maps/map1_walls.txt", function(data) {
 	wallMap = data;
+	console.log(wallMap);
 });
 
 //Add the WebSocket handlers
@@ -62,6 +64,15 @@ function addWebSocketHandlers() {
 			if(data.up) {player.y -= 5;}
 			if(data.right) {player.x += 5;}
 			if(data.down) {player.y += 5;}
+
+			// collision checks
+			var updatedCoord= collision.boundsCheck(player.x, player.y, wallMap.bounds);
+			player.x = updatedCoord.x;
+			player.y = updatedCoord.y;
+			updatedCoord = collision.wallCheck(wallMap.tiles,player.x, player.y);
+			player.x = updatedCoord.x;
+			player.y = updatedCoord.y;
+
 
 			player.angle = data.angle;
 

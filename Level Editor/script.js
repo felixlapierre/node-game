@@ -97,6 +97,17 @@ document.addEventListener('keydown', function(event) {
   }
   //Other keys
   switch(event.keyCode) {
+    case 27: //Esc
+    settings.textureTilingX = 0;
+    settings.textureTilingY = 0;
+    break;
+
+    case 81: //Q
+    var temp = settings.textureTilingX;
+    settings.textureTilingX = settings.textureTilingY;
+    settings.textureTilingY = temp;
+    break;
+
     case 69: //E
     settings.gridlock = !settings.gridlock;
     movement = {

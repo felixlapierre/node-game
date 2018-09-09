@@ -1,5 +1,6 @@
 var exports = module.exports = {};
 const map = require('./my_map.js');
+const Inventory = require('./my_inventory.js');
 var areas = {};
 var socket_rooms = {};
 
@@ -35,7 +36,8 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
       //TODO: Remove placeholder values
       x:300,
       y:300,
-      angle:0
+      angle:0,
+      inventory= Inventory.bag;
     }
     //TODO: Load maps
 
@@ -56,7 +58,8 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
       //TODO: Remove placeholder values
       x:300,
       y:300,
-      angle:0
+      angle:0,
+      inventory= Inventory.bag;
     }
   }
   if(areas[areaID].loaded) {

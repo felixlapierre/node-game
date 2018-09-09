@@ -7,16 +7,16 @@
     background: #eeee;
     display: block;
     margin: auto;
-    width: 800px;
-    height: 600px;
+    width: 1100px;
+    height: 800px;
     border: 5px solid black;
   }
   canvas.spritesheet {
     background: #eeee;
     display: block;
     margin: auto;
-    width: 400px;
-    height: 300px;
+    width: 800px;
+    height: 600px;
     border: 5px solid grey;
   }
   </style>
@@ -25,7 +25,7 @@
   <table>
     <tr>
       <td>
-        <canvas id = "canvas" class = "map" width = "800" height = "600" ></canvas>
+        <canvas id = "canvas" class = "map" width = "1100" height = "800" ></canvas>
       </td>
       <td rowspan = 2>
         <table>
@@ -34,7 +34,7 @@
             <p>Layer: <input id = "layerButton" type = "number" value = "0"></input></p>
           </tr>
           <tr>
-            <canvas id = "spritesheet" class = "spritesheet" width = "400" height = "300"></canvas>
+            <canvas id = "spritesheet" class = "spritesheet" width = "800" height = "600"></canvas>
           </tr>
         </table>
       </td>
@@ -54,16 +54,16 @@
             </tr>
             <tr>
               <td>New Map:</td>
-              <td><input type = "text" id = "spritesheet" placeholder = "Spritesheet"></input></td>
+              <td><input type = "text" id = "spritesheetInput" placeholder = "Spritesheet" value = "spritesheet1.png"></input></td>
               <td><button onclick = "newMap()">Create New Map</button></td>
             </tr>
             <tr>
               <td></td>
-              <td><input type = "number" id = "xbounds" placeholder = "X Bounds"></input></td>
+              <td><input type = "number" id = "xbounds" placeholder = "X Bounds" value = "3000"></input></td>
             </tr>
             <tr>
               <td></td>
-              <td><input type = "number" id = "ybounds" placeholder = "Y Bounds"></input></td>
+              <td><input type = "number" id = "ybounds" placeholder = "Y Bounds" value = "3000"></input></td>
             </tr>
           </table>
         </td>

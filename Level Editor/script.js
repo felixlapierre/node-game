@@ -4,7 +4,7 @@
 
 var textureMap = {
   spritesheet: "sprites/spritesheet1.png",
-  tiles: []
+  tiles: {}
 };
 
 var blockMap = {
@@ -167,19 +167,22 @@ function drawCanvas() {
 }
 
 function drawTiles() {
-  var obj;
-  for(var i = 0; i < textureMap.tiles.length; i++) {
-    for(var j = 0; j < textureMap.tiles[i].length; j++) {
-      obj = textureMap.tiles[i][j];
-      for(var x = obj.left; x <= obj.right; x += obj.width) {
-        for(var y = obj.top; y <= obj.bottom; y += obj.height) {
-          context.drawImage(spritesheet, obj.sourceX, obj.sourceY, obj.width, obj.height,
-            x - topleft.x, y - topleft.y, obj.width, obj.height);
+  var layer, obj;
+  for(var i in textureMap.tiles) {
+    if(textureMap.tiles.hasOwnProperty(i)) {
+      layer = textureMap.tiles[i];
+      for(var j = 0; j < layer.length; j++) {
+        obj = layer[j];
+        for(var x = obj.left; x <= obj.right; x += obj.width) {
+          for(var y = obj.top; y <= obj.bottom; y += obj.height) {
+            context.drawImage(spritesheet, obj.sourceX, obj.sourceY, obj.width, obj.height,
+              x - topleft.x, y - topleft.y, obj.width, obj.height);
+            }
+          }
         }
       }
     }
   }
-}
 
 function drawEditorElements() {
   context.drawImage(origin, 0, 0, 100, 100, -50 - topleft.x, -50 - topleft.y, 100, 100);
@@ -254,12 +257,12 @@ function handleCanvasClick(x, y) {
 //
 
 function newMap() {
-  if(!confirm("Are you sure? Current map will be discarded.")) {
-    textureMap.spritesheet = document.getElementById("spritesheet").value;
+  if(confirm("Are you sure? Current map will be discarded.")) {
+    textureMap.spritesheet = "sprites/" + document.getElementById("spritesheetInput").value;
     blockMap.bounds.x = document.getElementById("xbounds").value;
     blockMap.bounds.y = document.getElementById("ybounds").value;
 
-    spritesheet.src = "sprites/" + textureMap.spritesheet;
+    spritesheet.src = textureMap.spritesheet;
 
     //Call this function in spriteSelector.js
     setNewSpritesheet(spritesheet.src);
@@ -269,7 +272,7 @@ function newMap() {
 }
 
 function clearMap() {
-  textureMap.tiles = [];
+  textureMap.tiles = {};
   blockMap.tiles = [];
 }
 

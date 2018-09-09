@@ -29,7 +29,7 @@ function drawSpriteSheetSelector() {
   contextSpritesheet.clearRect(0, 0, canvasSpritesheet.width, canvasSpritesheet.height);
 
   //Draw the spritesheet onto it
-  contextSpritesheet.drawImage(spriteSelectorImage, 0, 0, 400, 300, 0, 0, 400, 300);
+  contextSpritesheet.drawImage(spriteSelectorImage, 0, 0, 800, 600, 0, 0, 800, 600);
 
   //Draw the selection square
   contextSpritesheet.beginPath();

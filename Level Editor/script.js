@@ -1,6 +1,8 @@
 //
 // Global Variables
 //
+var tileSize = 50;
+const baseTileSize = 50;
 
 var textureMap = {
   spritesheet: "sprites/spritesheet1.png",
@@ -46,8 +48,8 @@ var mouseMapPosition = {
   x:0,
   y:0,
   recalculate : function() {
-    this.x = mouse.x + topleft.x;
-    this.y = mouse.y + topleft.y;
+    this.x = mouse.x + (topleft.x * tileSize / baseTileSize);
+    this.y = mouse.y + (topleft.y * tileSize / baseTileSize);
   }
 }
 
@@ -155,6 +157,24 @@ canvas.addEventListener('click', function(event) {
   handleCanvasClick(mouseMapPosition.x, mouseMapPosition.y);
 }, false)
 
+canvas.addEventListener('wheel', function(event) {
+
+  //Don't question this function too much, the math works out
+  const zoomFactor = 0.2;
+  var centerAdjustFactor = zoomFactor / 2;
+  var zoom = tileSize / baseTileSize;
+  if(event.deltaY < 0) {
+    tileSize *= (1 + zoomFactor);
+    zoom = tileSize / baseTileSize;
+    topleft.x += canvas.width / zoom * centerAdjustFactor;
+    topleft.y += canvas.height / zoom * centerAdjustFactor;
+  } else if (tileSize > 10) {
+    tileSize /= (1 + zoomFactor);
+    topleft.x -= canvas.width / zoom * centerAdjustFactor;
+    topleft.y -= canvas.height / zoom * centerAdjustFactor;
+  }
+});
+
 function Tile(sourceX, sourceY, width, height, top, left, bottom, right, rotation) {
   this.sourceX = sourceX,
   this.sourceY = sourceY,
@@ -179,6 +199,7 @@ function drawCanvas() {
 
 function drawTiles() {
   var layer, obj;
+  var zoom = tileSize / baseTileSize;
   for(var i in textureMap.tiles) {
     if(textureMap.tiles.hasOwnProperty(i)) {
       layer = textureMap.tiles[i];
@@ -187,7 +208,7 @@ function drawTiles() {
         for(var x = obj.left; x <= obj.right; x += obj.width) {
           for(var y = obj.top; y <= obj.bottom; y += obj.height) {
             context.drawImage(spritesheet, obj.sourceX, obj.sourceY, obj.width, obj.height,
-              x - topleft.x, y - topleft.y, obj.width, obj.height);
+              (x - topleft.x) * zoom, (y - topleft.y) * zoom, obj.width * zoom, obj.height * zoom);
             }
           }
         }
@@ -196,25 +217,22 @@ function drawTiles() {
   }
 
 function drawEditorElements() {
-  context.drawImage(origin, 0, 0, 100, 100, -50 - topleft.x, -50 - topleft.y, 100, 100);
+  var zoom = tileSize / baseTileSize;
+  context.drawImage(origin, 0, 0, 100, 100, -tileSize - topleft.x * zoom, -tileSize - topleft.y * zoom, tileSize * 2, tileSize * 2);
+  //Apply gridlock to hovered location indicater
+  var hoverX, hoverY;
+  if(settings.gridlock == true) {
+    hoverX = round(mouseMapPosition.x, tileSize) - topleft.x * zoom;
+    hoverY = round(mouseMapPosition.y, tileSize) - topleft.y * zoom;
+  } else {
+    hoverX = mouse.x;
+    hoverY = mouse.y;
+  }
 
-  //Is the hovered location out of bounds?
-  if (!(mouseMapPosition.x < 0 || mouseMapPosition.y < 0)) {
-    //Apply gridlock to hovered location indicater
-    var hoverX, hoverY;
-    if(settings.gridlock == true) {
-      hoverX = parseInt(mouseMapPosition.x / 50.0) * 50 - topleft.x;
-      hoverY = parseInt(mouseMapPosition.y / 50.0) * 50 - topleft.y;
-    } else {
-      hoverX = mouse.x;
-      hoverY = mouse.y;
-    }
-
-    //Draw hovered location indicator
-    for(var i = 0; i <= settings.textureTilingX; i++) {
-      for(var j = 0; j <= settings.textureTilingY; j++) {
-        context.drawImage(hover, 0, 0, 50, 50, hoverX + 50 * i, hoverY + 50 * j, 50, 50);
-      }
+  //Draw hovered location indicator
+  for(var i = 0; i <= settings.textureTilingX; i++) {
+    for(var j = 0; j <= settings.textureTilingY; j++) {
+      context.drawImage(hover, 0, 0, 50, 50, hoverX + selected.width * i * zoom, hoverY + selected.height * j * zoom, selected.width * zoom, selected.height * zoom);
     }
   }
 
@@ -230,10 +248,12 @@ var update = setInterval(function() {
 }, 1000/30);
 
 function updateTopLeft() {
-  if(movement.left == true) {topleft.x -= 10;}
-  if(movement.right == true) {topleft.x += 10;}
-  if(movement.up == true) {topleft.y -= 10;}
-  if(movement.down == true) {topleft.y += 10;}
+  var zoom = tileSize / baseTileSize;
+  //We want to scroll faster when zoom factor is smaller
+  if(movement.left == true) {topleft.x -= 10 / zoom;}
+  if(movement.right == true) {topleft.x += 10 / zoom;}
+  if(movement.up == true) {topleft.y -= 10 / zoom;}
+  if(movement.down == true) {topleft.y += 10 / zoom;}
   mouseMapPosition.recalculate();
 }
 
@@ -242,9 +262,12 @@ function updateTopLeft() {
 //
 
 function handleCanvasClick(x, y) {
-  var trueX = (settings.gridlock == false) ? x : round(x, 50);
-  var trueY = (settings.gridlock == false) ? y : round(y, 50);
+  var zoom = tileSize / baseTileSize;
 
+  var trueX = (settings.gridlock == false) ? x : round(x, tileSize);
+  var trueY = (settings.gridlock == false) ? y : round(y, tileSize);
+  trueX /= zoom;
+  trueY /= zoom;
   //Get Layer
   var layer = parseInt(document.getElementById("layerButton").value);
   if(layer < 0)
@@ -257,8 +280,6 @@ function handleCanvasClick(x, y) {
   //Add the tile
   var obj = new Tile(selected.x, selected.y, selected.width, selected.height,
     trueY, trueX, trueY + settings.textureTilingY * selected.height, trueX + settings.textureTilingX * selected.width, 0);
-
-  console.log(obj);
 
   textureMap.tiles[layer].push(obj);
 }

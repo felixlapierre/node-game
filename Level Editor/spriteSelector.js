@@ -5,6 +5,7 @@ spriteSelectorImage.src = "sprites/spritesheet1.png";
 
 const selectionBoxWidth = 4;
 const roundTo = 10;
+const selectionBoxTileSize = 50;
 
 var mouseIsDown = false;
 selected = {
@@ -29,8 +30,11 @@ function drawSpriteSheetSelector() {
   contextSpritesheet.clearRect(0, 0, canvasSpritesheet.width, canvasSpritesheet.height);
 
   //Draw the spritesheet onto it
-  contextSpritesheet.drawImage(spriteSelectorImage, 0, 0, 800, 600, 0, 0, 800, 600);
-
+  if(settings.placing == "textures") {
+    contextSpritesheet.drawImage(spriteSelectorImage, 0, 0, 800, 600, 0, 0, 800, 600);
+  } else {
+    contextSpritesheet.drawImage(blocks, 0, 0, 800, 600, 0, 0, 800, 600);
+  }
   //Draw the selection square
   contextSpritesheet.beginPath();
 
@@ -47,6 +51,10 @@ function drawSpriteSheetSelector() {
 
   //Selecting which area of spritesheet to use
   canvasSpritesheet.onmousedown = function(event) {
+    if(settings.placing == "blocks") {
+      selectClosestSquare(event.x, event.y);
+      return;
+    }
     selected.x = round(event.x - canvasTopCorner.x, roundTo);
     selected.y = round(event.y - canvasTopCorner.y, roundTo);
 
@@ -56,6 +64,9 @@ function drawSpriteSheetSelector() {
   }
 
 canvasSpritesheet.onmousemove = function(event) {
+  if(settings.placing == "blocks") {
+    return; //This option is not available when selecting blocks
+  }
   var truePos = {
     x: round(event.x - canvasTopCorner.x, roundTo),
     y: round(event.y - canvasTopCorner.y, roundTo)
@@ -85,11 +96,15 @@ canvasSpritesheet.onmouseup = function(event) {
 }
 
   canvasSpritesheet.addEventListener('dblclick', function(event) {
-    selected.x = round((event.x - canvasTopCorner.x),50);
-    selected.y = round((event.y - canvasTopCorner.y),50);
-    selected.width = 50;
-    selected.height = 50;
+    selectClosestSquare(event.x, event.y);
   });
+
+function selectClosestSquare(x, y) {
+  selected.x = round((x - canvasTopCorner.x),selectionBoxTileSize);
+  selected.y = round((y - canvasTopCorner.y),selectionBoxTileSize);
+  selected.width = selectionBoxTileSize;
+  selected.height = selectionBoxTileSize;
+}
 
 function round(number, to) {
   return number -= number % to;

@@ -7,8 +7,8 @@
     background: #eeee;
     display: block;
     margin: auto;
-    width: 1100px;
-    height: 800px;
+    width: 1000px;
+    height: 750px;
     border: 5px solid black;
   }
   canvas.spritesheet {
@@ -19,22 +19,43 @@
     height: 600px;
     border: 5px solid grey;
   }
+  .blockSettings {
+    visibility: collapse;
+  }
   </style>
 </head>
 <body>
   <table>
     <tr>
       <td>
-        <canvas id = "canvas" class = "map" width = "1100" height = "800" ></canvas>
+        <canvas id = "canvas" class = "map" width = "1000" height = "750" ></canvas>
       </td>
       <td rowspan = 2>
         <table>
           <tr>
-            <p>SETTING GO HERE</p>
-            <p>Layer: <input id = "layerButton" type = "number" value = "0"></input></p>
+            <td>
+              <table>
+                <tr>
+                  <td><p>SETTING GO HERE</p></td>
+                </tr>
+                <tr class = "textureSettings" id = "textureSettings">
+                  <td>
+                    <p>Texture settings: </p>
+                    <p id = "layerDisplay">Layer: 1</p>
+                  </td>
+                </tr>
+                <tr class = "blockSettings" id = "blockSettings">
+                  <td>
+                    <p>Block settings:</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
           </tr>
           <tr>
-            <canvas id = "spritesheet" class = "spritesheet" width = "800" height = "600"></canvas>
+            <td>
+              <canvas id = "spritesheet" class = "spritesheet" width = "800" height = "600"></canvas>
+            </td>
           </tr>
         </table>
       </td>
@@ -44,7 +65,7 @@
         <table>
           <tr>
             <td>Save Map:</td>
-            <td><input id = "inputFileNameToSaveAs" placeholder = "Filename"></input></td>
+            <td><input type = "text" id = "inputFileNameToSaveAs" placeholder = "Filename" tabindex = "-1"></input></td>
             <td><button onclick = "saveMapToFile()">Save To File</td>
             </tr>
             <tr>
@@ -54,16 +75,16 @@
             </tr>
             <tr>
               <td>New Map:</td>
-              <td><input type = "text" id = "spritesheetInput" placeholder = "Spritesheet" value = "spritesheet1.png"></input></td>
+              <td><input type = "text" id = "spritesheetInput" placeholder = "Spritesheet" value = "spritesheet1.png" tabindex = "-1"></input></td>
               <td><button onclick = "newMap()">Create New Map</button></td>
             </tr>
             <tr>
               <td></td>
-              <td><input type = "number" id = "xbounds" placeholder = "X Bounds" value = "3000"></input></td>
+              <td><input type = "number" id = "xbounds" placeholder = "X Bounds" value = "3000" tabindex = "-1"></input></td>
             </tr>
             <tr>
               <td></td>
-              <td><input type = "number" id = "ybounds" placeholder = "Y Bounds" value = "3000"></input></td>
+              <td><input type = "number" id = "ybounds" placeholder = "Y Bounds" value = "3000" tabindex = "-1"></input></td>
             </tr>
           </table>
         </td>
@@ -72,5 +93,5 @@
   </body>
   <script type = "text/javascript" src = "spriteSelector.js"></script>
   <script type = "text/javascript" src = "script.js"></script>
-  </script>
-  </html>
+</script>
+</html>

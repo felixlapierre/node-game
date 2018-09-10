@@ -3,6 +3,7 @@
 //
 var tileSize = 50;
 const baseTileSize = 50;
+const zoomFactor = 0.2;
 
 var textureMap = {
   spritesheet: "sprites/spritesheet1.png",
@@ -11,8 +12,8 @@ var textureMap = {
 
 var blockMap = {
   bounds: {
-    x: undefined,
-    y: undefined
+    x: 3000,
+    y: 3000
   },
   tiles: []
 };
@@ -30,6 +31,8 @@ var origin = new Image();
 origin.src = "sprites/origin.png";
 var hover = new Image();
 hover.src = "sprites/hover.png";
+var blocks = new Image();
+blocks.src = "sprites/blocks.png"
 
 var movement = {
   up: false,
@@ -57,7 +60,9 @@ var settings = {
   gridlock: false,
   adjustingTiling: false,
   textureTilingX:0,
-  textureTilingY:0
+  textureTilingY:0,
+  layer:1,
+  placing:"textures"
 }
 
 //
@@ -111,7 +116,9 @@ document.addEventListener('keydown', function(event) {
     break;
 
     case 69: //E
-    settings.gridlock = !settings.gridlock;
+    if(settings.placing == "textures") {
+      settings.gridlock = !settings.gridlock;
+    }
     movement = {
       up: false,
       down: false,
@@ -123,6 +130,16 @@ document.addEventListener('keydown', function(event) {
     case 16: //Shift
     settings.adjustingTiling = true;
     break;
+
+    case 9: //tab
+    toggleEditingMode();
+    break;
+  }
+
+  //Adjusting layer
+  if(event.keyCode >= 48 && event.keyCode <= 57) {
+    settings.layer = event.keyCode - 48;
+    document.getElementById("layerDisplay").innerHTML = "Layer: " + settings.layer;
   }
 });
 
@@ -160,7 +177,6 @@ canvas.addEventListener('click', function(event) {
 canvas.addEventListener('wheel', function(event) {
 
   //Don't question this function too much, the math works out
-  const zoomFactor = 0.2;
   var centerAdjustFactor = zoomFactor / 2;
   var zoom = tileSize / baseTileSize;
   if(event.deltaY < 0) {
@@ -194,6 +210,9 @@ function Tile(sourceX, sourceY, width, height, top, left, bottom, right, rotatio
 function drawCanvas() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   drawTiles();
+  if(settings.placing == "blocks") {
+    drawBlocks();
+  }
   drawEditorElements();
 }
 
@@ -209,16 +228,41 @@ function drawTiles() {
           for(var y = obj.top; y <= obj.bottom; y += obj.height) {
             context.drawImage(spritesheet, obj.sourceX, obj.sourceY, obj.width, obj.height,
               (x - topleft.x) * zoom, (y - topleft.y) * zoom, obj.width * zoom, obj.height * zoom);
-            }
           }
         }
       }
     }
   }
+}
+
+function drawBlocks() {
+  var zoom = tileSize / baseTileSize;
+  //Dim textures to remove focus
+  context.beginPath();
+  context.fillStyle = "rgba(255, 255, 255, 0.5)";
+  context.rect(0, 0, canvas.width, canvas.height);
+  context.fill();
+
+  //Draw blocks
+  var obj;
+  for(var i = 0; i < blockMap.tiles.length; i++) {
+    obj = blockMap.tiles[i];
+    var sourceX = 0;
+    if(obj.type == "teleporter") {
+      sourceX = 50;
+    }
+    for(var x = obj.left; x <= obj.right; x += 50) {
+      for(var y = obj.top; y <= obj.bottom; y += 50) {
+        context.drawImage(blocks, sourceX, 0, 50, 50, (x - topleft.x) * zoom, (y - topleft.y) * zoom, tileSize, tileSize);
+      }
+    }
+  }
+}
 
 function drawEditorElements() {
   var zoom = tileSize / baseTileSize;
   context.drawImage(origin, 0, 0, 100, 100, -tileSize - topleft.x * zoom, -tileSize - topleft.y * zoom, tileSize * 2, tileSize * 2);
+
   //Apply gridlock to hovered location indicater
   var hoverX, hoverY;
   if(settings.gridlock == true) {
@@ -239,7 +283,7 @@ function drawEditorElements() {
   //Draw mouse position
   context.font = "16px Arial";
   context.fillstyle = "#0095DD";
-  context.fillText("(" + mouse.x + "," + mouse.y + ")", 0, 0);
+  context.fillText("(" + mouseMapPosition.x + "," + mouseMapPosition.y + ")", canvas.width - 90, canvas.height - 14);
 }
 
 var update = setInterval(function() {
@@ -261,7 +305,36 @@ function updateTopLeft() {
 // Editing Level
 //
 
+function toggleEditingMode() {
+  if(settings.placing == "textures") {
+    settings.placing = "blocks";
+    selected = {
+      x:0,
+      y:0,
+      width:50,
+      height:50
+    }
+    settings.gridlock = true;
+    document.getElementById("textureSettings").style.visibility = "collapse";
+    document.getElementById("blockSettings").style.visibility = "visible";
+  } else {
+    settings.placing = "textures";
+    document.getElementById("textureSettings").style.visibility = "visible";
+    document.getElementById("blockSettings").style.visibility = "collapse";
+
+  }
+}
+
 function handleCanvasClick(x, y) {
+  if(settings.placing == "textures") {
+    addTileToMap(x, y);
+  }
+  else {
+    addBlockToMap(x, y);
+  }
+}
+
+function addTileToMap(x, y) {
   var zoom = tileSize / baseTileSize;
 
   var trueX = (settings.gridlock == false) ? x : round(x, tileSize);
@@ -269,7 +342,7 @@ function handleCanvasClick(x, y) {
   trueX /= zoom;
   trueY /= zoom;
   //Get Layer
-  var layer = parseInt(document.getElementById("layerButton").value);
+  var layer = settings.layer;
   if(layer < 0)
     layer = 0;
 
@@ -281,7 +354,27 @@ function handleCanvasClick(x, y) {
   var obj = new Tile(selected.x, selected.y, selected.width, selected.height,
     trueY, trueX, trueY + settings.textureTilingY * selected.height, trueX + settings.textureTilingX * selected.width, 0);
 
-  textureMap.tiles[layer].push(obj);
+  textureMap.tiles[layer].push(obj);}
+
+function addBlockToMap(x, y) {
+  var zoom = tileSize / baseTileSize;
+  var trueX = round(x, tileSize) / zoom;
+  var trueY = round(y, tileSize) / zoom;
+  var blockType;
+  if(selected.x == 0 && selected.y == 0)
+    blockType = "wall";
+  else if (selected.x == 50 && selected.y == 0)
+    blockType = "teleporter";
+
+  var block = {
+    left:trueX,
+    top:trueY,
+    right:trueX + tileSize * settings.textureTilingX,
+    bottom:trueY + tileSize * settings.textureTilingY,
+    type:blockType
+  }
+
+  blockMap.tiles.push(block);
 }
 
 //

@@ -4,7 +4,7 @@ Online multiplayer survival game made using Javascript, Node.js, Sockets.io, Exp
 
 By Felix Lapierre and Jun Loke
 
-How to Run:
+# How to Run
 
 Make sure you have node.js installed on your system.
 In the folder containing the repo, run the following commands:

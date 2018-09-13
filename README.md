@@ -10,6 +10,7 @@ Make sure you have node.js installed on your system.
 In the folder containing the repo, run the following commands:
 
 npm init
+
 npm install --save express socket.io
 
 This will install Express and Socket.io and all of their dependencies in the folder, which are necessary to run the server.

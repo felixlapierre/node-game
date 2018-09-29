@@ -1,5 +1,6 @@
 var exports = module.exports = {};
 const map = require('./my_map.js');
+const Inventory = require('./my_inventory.js');
 var areas = {};
 var socket_rooms = {};
 

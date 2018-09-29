@@ -63,10 +63,12 @@ io.on('connection', function(socket) {
 		player.intent.up = data.up;
 		player.intent.down = data.down;
 		player.angle = data.angle;
+		player.bag.selected = data.selected;
 	});
 
 	socket.on('disconnect', function() {
 		areas.removePlayer(socket.id);
+		console.log("Disconnected socket  " + socket.id);
 	});
 	
 });
@@ -75,7 +77,7 @@ function newPlayer(socket) {
 	areas.moveSocketTo(socket, 'default', function(socketID) {
 		//Send the player the map data
 		io.sockets.connected[socket.id].emit('mapdata', areas.getAreaOfSocketID(socketID).textureMap);
-		console.log("Sent map data to " + socket.id);
+		console.log("New player on socket " + socket.id);
 	});
 }
 
@@ -110,11 +112,11 @@ setInterval(function() {
 					player.x = updatedCoord.x;
 					player.y = updatedCoord.y;
 			
-					io.sockets.connected[socketID].emit('updateSpecificPlayer', {x:player.x, y:player.y, bag:{contents:player.bag.contents}});
+					io.sockets.connected[socketID].emit('returnPlayerState', {x:player.x, y:player.y, bag:{contents:player.bag.contents}});
 				}
 			}
 		}
 
-		io.to(areaID).emit('state', areas.getAreaByID(areaID).players);
+		io.to(areaID).emit('areaState', areas.getAreaByID(areaID).players);
 	});
 }, 1000 / 60);

@@ -10,7 +10,7 @@ var bag = {
 	selected: 0,
 }
 
-var movement = {
+var playerState = {
 	up: false,
 	down: false,
 	left: false,
@@ -28,16 +28,16 @@ var mouse = {
 document.addEventListener('keydown', function(event) {
 	switch(event.keyCode) {
 		case 65: //A
-		movement.left = true;
+		playerState.left = true;
 		break;
 		case 87: //W
-		movement.up = true;
+		playerState.up = true;
 		break;
 		case 68: //D
-		movement.right = true;
+		playerState.right = true;
 		break;
 		case 83: //S
-		movement.down = true;
+		playerState.down = true;
 		break;
 	}
 	if(event.keyCode >= 49 && event.keyCode <= 57) {
@@ -49,16 +49,16 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('keyup', function(event) {
 	switch(event.keyCode) {
 		case 65: //A
-		movement.left = false;
+		playerState.left = false;
 		break;
 		case 87: //W
-		movement.up = false;
+		playerState.up = false;
 		break;
 		case 68: //D
-		movement.right = false;
+		playerState.right = false;
 		break;
 		case 83: //S
-		movement.down = false;
+		playerState.down = false;
 		break;
 	}
 });
@@ -69,20 +69,10 @@ document.addEventListener('mousemove', function(event) {
 }, false);
 
 document.addEventListener('wheel', function(event) {
-	console.log(event);
-	console.log(event.deltaY);
-	// TODO: change scroll sensitivity
-	bag.selected = (bag.selected-(event.deltaY/100))%9;
+	bag.selected = (bag.selected+(event.deltaY/100))%9;
 	if(bag.selected < 0) {
 		bag.selected += 9;
 	}
-	// if (event.deltaY>0){
-	// 	bag.selected = (bag.selected-(deltaY/50))%9;
-	// }
-	// else{
-	// 	bag.selected = (bag.selected+(deltaY/50))%9;
-	// }
-	console.log(bag.selected);
 	return;
 });
 
@@ -91,16 +81,16 @@ socket.emit('new player');
 
 setInterval(function() {
 	calculateAngle();
-	socket.emit('movement', movement);
+	socket.emit('movement', playerState);
 }, 1000 / 60);
 
 function calculateAngle() {
 	var deltaX = mouse.x - canvas.width / 2;
 	var deltaY = mouse.y - canvas.height / 2;
 
-	movement.angle = Math.atan(deltaY/deltaX);
+	playerState.angle = Math.atan(deltaY/deltaX);
 	if(deltaX < 0) {
-		movement.angle += Math.PI;
+		playerState.angle += Math.PI;
 	}
 }
 
@@ -121,7 +111,7 @@ var spritesheet = new Image();
 var itemBar = new Image();
 itemBar.src = "static/ItemBar.png";
 
-socket.on('state', function(players) {
+socket.on('areaState', function(players) {
 	context.clearRect(0, 0, 800, 600);
 	context.fillStyle = 'green';
 
@@ -158,7 +148,7 @@ socket.on('mapdata', function(data) {
 	spritesheet.src = "static/" + data.spritesheet;
 });
 
-socket.on('updateSpecificPlayer', function(data) {
+socket.on('returnPlayerState', function(data) {
 	topleft.x = data.x - canvas.width / 2;
 	topleft.y = data.y - canvas.height / 2;
 	bag.contents = data.bag.contents;

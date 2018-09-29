@@ -8,16 +8,6 @@ class Bag {
     this.contents = [],
     this.selected = 0
   }
-
-
-  //Convert to regular JSON object so it can be sent over socket
-  //(can ES6 objects be sent over sockets without passing the functions?)
-  toJSONObject() {
-    return {
-      contents: this.contents,
-      selected: this.selected
-    }
-  }
 }
 function createBag() {
   return new Bag();

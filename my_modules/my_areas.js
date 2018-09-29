@@ -1,6 +1,6 @@
 var exports = module.exports = {};
 const map = require('./my_map.js');
-const inventory = require('./my_inventory.js');
+const PLAYER = require('./my_player.js');
 var areas = {};
 var socket_rooms = {};
 
@@ -32,7 +32,7 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
       textureMap: undefined,
       wallMap: undefined
     }
-    areas[areaID].players[socket.id] = new Player(300, 300);
+    areas[areaID].players[socket.id] = PLAYER.create();
     //TODO: Load maps
 
     //NOTE: this might be incorrect pathing
@@ -48,7 +48,7 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
       });
     });
   } else {
-    areas[areaID].players[socket.id] = new Player(300, 300);
+    areas[areaID].players[socket.id] = PLAYER.create();
   }
   if(areas[areaID].loaded) {
     callToDeliverMap(socket.id);
@@ -72,20 +72,6 @@ function forEachAreaID(callback) {
   for(var areaID in areas) {
     callback(areaID);
   }
-}
-
-function Player(x, y) {
-  this.x = x;
-  this.y = y;
-  this.angle = 0;
-  this.intent = {
-    left:false,
-    right:false,
-    up:false,
-    down:false,
-    click:false
-  }
-  this.bag = inventory.createBag();
 }
 
 exports.moveSocketTo = moveSocketTo;

@@ -1,4 +1,7 @@
-//Dependencies
+//
+// Dependencies
+//
+
 const express = require('express');
 const http = require('http');
 const path = require('path');
@@ -7,6 +10,10 @@ const socketIO = require('socket.io');
 //My module Dependencies
 const collision = require('./my_modules/my_collision.js');
 const areas = require('./my_modules/my_areas.js');
+
+//
+// Set Up Server
+//
 
 var app = express();
 var server = http.Server(app);
@@ -27,8 +34,11 @@ server.listen(portNumber, function() {
 	console.log('Starting server on port ' + portNumber);
 });
 
-//Add the WebSocket handlers
+//
+// Websocket handlers
+//
 io.on('connection', function(socket) {
+
 	socket.on('new player', function() {
 		newPlayer(socket);
 	});
@@ -58,6 +68,7 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', function() {
 		areas.removePlayer(socket.id);
 	});
+	
 });
 
 function newPlayer(socket) {
@@ -68,7 +79,9 @@ function newPlayer(socket) {
 	});
 }
 
-//Update loop function
+//
+// Update lööp
+//
 var lastUpdateTime = (new Date()).getTime();
 setInterval(function() {
 	//Calculate how much time has elapsed

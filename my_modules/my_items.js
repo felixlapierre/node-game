@@ -2,13 +2,15 @@
 
 */
 class Item{
-    var name;
-    var type;
-    var quantity;
+  constructor(name, type, quantity) {
+    this.name = name;
+    this.type = type;
+    this.quantity = quantity;
+  }
+  
+  update(){}
 
-function update(){}
-
-function draw(){}
+  draw(){}
 
 }
 

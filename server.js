@@ -110,7 +110,7 @@ setInterval(function() {
 					player.x = updatedCoord.x;
 					player.y = updatedCoord.y;
 			
-					io.sockets.connected[socketID].emit('updateCenter', {x:player.x, y:player.y});
+					io.sockets.connected[socketID].emit('updateSpecificPlayer', {x:player.x, y:player.y, bag:{contents:player.bag.contents}});
 				}
 			}
 		}

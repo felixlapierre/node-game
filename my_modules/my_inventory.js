@@ -3,10 +3,25 @@ Bag is an array with 9 items visible on screen
 Selection item index is determined by 'selected' and changes with scroll
 Selected item can be used via left click
 */
-var bag = {
-    contents: [],
-    selected: 0
-  };
+class Bag {
+  constructor() {
+    this.contents = [],
+    this.selected = 0
+  }
+
+
+  //Convert to regular JSON object so it can be sent over socket
+  //(can ES6 objects be sent over sockets without passing the functions?)
+  toJSONObject() {
+    return {
+      contents: this.contents,
+      selected: this.selected
+    }
+  }
+}
+function createBag() {
+  return new Bag();
+}
 
 /*
 Picks up item
@@ -80,7 +95,7 @@ function removeOne(indexOfItem){
 
 }
 
-module.exports.bag= bag;
+module.exports.createBag = createBag;
 module.exports.pickUp = pickUp;
 module.exports.scrollSelect= scrollSelect;
 module.exports.removeOne = removeOne;

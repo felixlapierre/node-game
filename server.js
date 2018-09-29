@@ -48,23 +48,11 @@ io.on('connection', function(socket) {
 			return;
 		}
 
-		if(data.left) {player.x -= 5;}
-		if(data.up) {player.y -= 5;}
-		if(data.right) {player.x += 5;}
-		if(data.down) {player.y += 5;}
-
-		// collision checks
-		var updatedCoord= collision.boundsCheck(player.x, player.y, currentArea.wallMap.bounds);
-		player.x = updatedCoord.x;
-		player.y = updatedCoord.y;
-		updatedCoord = collision.wallCheck(currentArea.wallMap.tiles,player.x, player.y);
-		player.x = updatedCoord.x;
-		player.y = updatedCoord.y;
-
-
+		player.intent.left = data.left;
+		player.intent.right = data.right;
+		player.intent.up = data.up;
+		player.intent.down = data.down;
 		player.angle = data.angle;
-
-		io.sockets.connected[socket.id].emit('updateCenter', {x:player.x, y:player.y});
 	});
 
 	socket.on('disconnect', function() {
@@ -80,8 +68,40 @@ function newPlayer(socket) {
 	});
 }
 
+//Update loop function
+var lastUpdateTime = (new Date()).getTime();
 setInterval(function() {
-	areas.forEachAreaID(function(areaID) {
+	//Calculate how much time has elapsed
+	var currentTime = (new Date()).getTime();
+	var deltaT = (currentTime - lastUpdateTime) / 1000.0;
+	lastUpdateTime = currentTime;
+
+	//Update every player in every area
+	areas.forEachAreaID((areaID) => {
+		var area = areas.getAreaByID(areaID);
+		if(area.loaded == true) {
+			for(var socketID in area.players) {
+				if(area.players.hasOwnProperty(socketID)) {
+					var player = area.players[socketID];
+
+					if(player.intent.left) {player.x -= 300 * deltaT;}
+					if(player.intent.up) {player.y -= 300 * deltaT;}
+					if(player.intent.right) {player.x += 300 * deltaT}
+					if(player.intent.down) {player.y += 300 * deltaT;}
+			
+					// collision checks
+					var updatedCoord= collision.boundsCheck(player.x, player.y, area.wallMap.bounds);
+					player.x = updatedCoord.x;
+					player.y = updatedCoord.y;
+					updatedCoord = collision.wallCheck(area.wallMap.tiles,player.x, player.y);
+					player.x = updatedCoord.x;
+					player.y = updatedCoord.y;
+			
+					io.sockets.connected[socketID].emit('updateCenter', {x:player.x, y:player.y});
+				}
+			}
+		}
+
 		io.to(areaID).emit('state', areas.getAreaByID(areaID).players);
 	});
 }, 1000 / 60);

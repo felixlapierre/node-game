@@ -16,6 +16,7 @@ var playerState = {
 	left: false,
 	right: false,
 	angle:0,
+	click:false,
 	selected:bag.selected
 }
 
@@ -61,6 +62,14 @@ document.addEventListener('keyup', function(event) {
 		playerState.down = false;
 		break;
 	}
+});
+
+document.addEventListener('mousedown', function(event) {
+	playerState.click = true;
+});
+
+document.addEventListener('mouseup', function(event) {
+	playerState.click = false;
 });
 
 document.addEventListener('mousemove', function(event) {
@@ -111,6 +120,20 @@ var spritesheet = new Image();
 var itemBar = new Image();
 itemBar.src = "static/ItemBar.png";
 
+var textures = {};
+
+function getTexture(source) {
+	var returned = textures[source];
+	if(returned != undefined) {
+		return returned;
+	} else {
+		var newTexture = new Image();
+		newTexture.src = source;
+		textures[source] = newTexture;
+		return newTexture;
+	}
+}
+
 socket.on('areaState', function(players) {
 	context.clearRect(0, 0, 800, 600);
 	context.fillStyle = 'green';
@@ -135,6 +158,11 @@ socket.on('areaState', function(players) {
 		context.rotate(player.angle + Math.PI / 2);
 		context.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
 		context.restore();
+
+		for(var jd in player.textures) {
+			var obj = player.textures[jd];
+			drawFormattedImage(context, obj);
+		}
 	}
 
 	//Determine the location at which the bag will be drawn
@@ -165,4 +193,8 @@ function drawBag(context, x, y, sprite) {
 		//TODO: Draw the contents of that item slot
 		}
 	}
+}
+
+function drawFormattedImage(context, img) {
+	context.drawImage(getTexture(img.source), img.sourceX, img.sourceY, img.sourceW, img.sourceH, img.destX, img.destY, img.destW, img.destH);
 }

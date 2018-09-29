@@ -62,6 +62,7 @@ io.on('connection', function(socket) {
 		player.intent.right = data.right;
 		player.intent.up = data.up;
 		player.intent.down = data.down;
+		player.intent.click = data.click;
 		player.angle = data.angle;
 		player.bag.selected = data.selected;
 	});
@@ -98,6 +99,8 @@ setInterval(function() {
 			for(var socketID in area.players) {
 				if(area.players.hasOwnProperty(socketID)) {
 					var player = area.players[socketID];
+
+					player.update(deltaT);
 
 					if(player.intent.left) {player.x -= 300 * deltaT;}
 					if(player.intent.up) {player.y -= 300 * deltaT;}

@@ -9,7 +9,7 @@ class Item {
 
   update(selected, click, elapsedTime, textures) {
     //Override this method to define item behaviour
-   }
+  }
 }
 
 class Weapon extends Item {
@@ -39,7 +39,9 @@ class Weapon extends Item {
   Proper release triggers SWING state which deals damage to an area //TODO: define range of weapon and implement parrying
   After SWING, restore to SHEATHED state
 */
-const lengthSwing = 500;
+const lengthSwing = 300;
+const minSwingBack = 0;
+const perfectSwingBack = 1500;
 class Sword extends Weapon {
   constructor() {
     super(1, "sheathed");
@@ -60,21 +62,21 @@ class Sword extends Weapon {
         break;
 
       case "swingback":
-        if (selected == false || (click == false && this.timeInState < 300)) {
+        if (selected == false || (click == false && this.timeInState < minSwingBack)) {
           this.setState("sheathed");
         } else if (click == false) {
           //Damage factor calculation
-          if(this.timeInState < 1500) {
-            damageFactor = (this.timeInState - 300) / 1500;
+          if (this.timeInState < perfectSwingBack) {
+            this.damageFactor = (this.timeInState - minSwingBack) / perfectSwingBack;
           } else {
-            damageFactor = 0.7 + 0.3 * 1500 / this.timeInState;
+            this.damageFactor = 0.7 + 0.3 * perfectSwingBack / this.timeInState;
           }
           this.setState("swinging");
         }
         break;
 
       case "swinging":
-        if(this.timeInState > 500) {
+        if (this.timeInState > lengthSwing) {
           this.setState("sheathed");
         }
         break;
@@ -82,7 +84,7 @@ class Sword extends Weapon {
   }
 
   createTextureFromState() {
-    switch(this.state) {
+    switch (this.state) {
       case "sheathed":
         return undefined;
 
@@ -90,18 +92,39 @@ class Sword extends Weapon {
         return undefined; //Placeholder
 
       case "swinging":
-      return {
-        sprite:"static/Slash.png",
-        sourceX: (int)(this.timeInState / lengthSwing * 5) * 45,
-        sourceY: 0,
-        sourceW: 45,
-        sourceH: 66,
-        destX: 0,
-        destY: 0,
-        destW: 45,
-        destH: 66
-      }
+        return new PlayerLockedTexture("static/Slash.png",
+          {
+            x: Math.floor(this.timeInState / (lengthSwing / 5)) * 56,
+            y: 0,
+            w: 56,
+            h: 66
+          },
+          {
+            x: -56/2,
+            y:-66,
+            w:56,
+            h:66
+          },
+          0, true);
     }
+  }
+}
+
+class PlayerLockedTexture {
+  constructor(sprite, source, dest, angle, rotateWithPlayer) {
+    this.sprite = sprite;
+    this.source = {};
+    this.source.x = source.x;
+    this.source.y = source.y;
+    this.source.w = source.w;
+    this.source.h = source.h;
+    this.dest = {};
+    this.dest.x = dest.x;
+    this.dest.y = dest.y;
+    this.dest.w = dest.w;
+    this.dest.h = dest.h;
+    this.angle = angle;
+    this.rotateWithPlayer = rotateWithPlayer;
   }
 }
 /*
@@ -112,4 +135,4 @@ class Sword extends Weapon {
   potion  => will consume, increase HP & invoke removeOne()
 */
 
-exports.createSword = () => {return new Sword()};
+exports.createSword = () => { return new Sword() };

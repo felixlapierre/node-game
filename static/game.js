@@ -151,18 +151,7 @@ socket.on('areaState', function(players) {
 	}
 
 	for(var id in players) {
-		var player = players[id];
-		context.save();
-		//TODO: Implement the screen offset
-		context.translate(player.x - topleft.x, player.y - topleft.y);
-		context.rotate(player.angle + Math.PI / 2);
-		context.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
-		context.restore();
-
-		for(var jd in player.textures) {
-			var obj = player.textures[jd];
-			drawFormattedImage(context, obj);
-		}
+		drawPlayer(players[id]);
 	}
 
 	//Determine the location at which the bag will be drawn
@@ -195,6 +184,28 @@ function drawBag(context, x, y, sprite) {
 	}
 }
 
-function drawFormattedImage(context, img) {
-	context.drawImage(getTexture(img.source), img.sourceX, img.sourceY, img.sourceW, img.sourceH, img.destX, img.destY, img.destW, img.destH);
+function drawPlayer(player) {
+	context.save();
+	//TODO: Implement the screen offset
+	context.translate(player.x - topleft.x, player.y - topleft.y);
+	context.rotate(player.angle + Math.PI / 2);
+	context.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
+	context.restore();
+
+	console.log(player.textures);
+	for(var jd in player.textures) {
+		var img = player.textures[jd];
+		context.save();
+		context.translate(player.x - topleft.x, player.y - topleft.y);
+		if(img.rotateWithPlayer) {
+			context.rotate(player.angle + Math.PI / 2);
+		}
+		context.translate(img.dest.x, img.dest.y);
+		context.rotate(img.angle);
+		
+		context.drawImage(getTexture(img.sprite), img.source.x, img.source.y, img.source.w, img.source.h, 
+		0, 0, img.dest.w, img.dest.h);
+
+		context.restore();
+	}
 }

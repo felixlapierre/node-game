@@ -90,6 +90,7 @@ setInterval(function() {
 	//Calculate how much time has elapsed
 	var currentTime = (new Date()).getTime();
 	var deltaT = (currentTime - lastUpdateTime) / 1000.0;
+	var timeElapsedMilliseconds = deltaT * 1000;
 	lastUpdateTime = currentTime;
 
 	//Update every player in every area
@@ -100,7 +101,7 @@ setInterval(function() {
 				if(area.players.hasOwnProperty(socketID)) {
 					var player = area.players[socketID];
 
-					player.update(deltaT);
+					player.update(timeElapsedMilliseconds);
 
 					if(player.intent.left) {player.x -= 300 * deltaT;}
 					if(player.intent.up) {player.y -= 300 * deltaT;}

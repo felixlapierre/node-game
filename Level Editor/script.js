@@ -34,7 +34,7 @@ hover.src = "sprites/hover.png";
 var blocks = new Image();
 blocks.src = "sprites/blocks.png"
 
-var movement = {
+var playerState = {
   up: false,
   down: false,
   left: false,
@@ -89,16 +89,16 @@ document.addEventListener('keydown', function(event) {
   } else {
     switch(event.keyCode) {
       case 65: //A
-      movement.left = true;
+      playerState.left = true;
       break;
       case 87: //W
-      movement.up = true;
+      playerState.up = true;
       break;
       case 68: //D
-      movement.right = true;
+      playerState.right = true;
       break;
       case 83: //S
-      movement.down = true;
+      playerState.down = true;
       break;
     }
   }
@@ -119,7 +119,7 @@ document.addEventListener('keydown', function(event) {
     if(settings.placing == "textures") {
       settings.gridlock = !settings.gridlock;
     }
-    movement = {
+    playerState = {
       up: false,
       down: false,
       left: false,
@@ -146,16 +146,16 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('keyup', function(event) {
   switch(event.keyCode) {
     case 65: //A
-    movement.left = false;
+    playerState.left = false;
     break;
     case 87: //W
-    movement.up = false;
+    playerState.up = false;
     break;
     case 68: //D
-    movement.right = false;
+    playerState.right = false;
     break;
     case 83: //S
-    movement.down = false;
+    playerState.down = false;
     break;
 
     case 16: //Shift
@@ -294,10 +294,10 @@ var update = setInterval(function() {
 function updateTopLeft() {
   var zoom = tileSize / baseTileSize;
   //We want to scroll faster when zoom factor is smaller
-  if(movement.left == true) {topleft.x -= 10 / zoom;}
-  if(movement.right == true) {topleft.x += 10 / zoom;}
-  if(movement.up == true) {topleft.y -= 10 / zoom;}
-  if(movement.down == true) {topleft.y += 10 / zoom;}
+  if(playerState.left == true) {topleft.x -= 10 / zoom;}
+  if(playerState.right == true) {topleft.x += 10 / zoom;}
+  if(playerState.up == true) {topleft.y -= 10 / zoom;}
+  if(playerState.down == true) {topleft.y += 10 / zoom;}
   mouseMapPosition.recalculate();
 }
 

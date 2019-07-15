@@ -1,4 +1,7 @@
-//Dependencies
+//
+// Dependencies
+//
+
 const express = require('express');
 const http = require('http');
 const path = require('path');
@@ -7,6 +10,10 @@ const socketIO = require('socket.io');
 //My module Dependencies
 const collision = require('./my_modules/my_collision.js');
 const areas = require('./my_modules/my_areas.js');
+
+//
+// Set Up Server
+//
 
 var app = express();
 var server = http.Server(app);
@@ -27,8 +34,11 @@ server.listen(portNumber, function() {
 	console.log('Starting server on port ' + portNumber);
 });
 
-//Add the WebSocket handlers
+//
+// Websocket handlers
+//
 io.on('connection', function(socket) {
+
 	socket.on('new player', function() {
 		newPlayer(socket);
 	});
@@ -52,28 +62,35 @@ io.on('connection', function(socket) {
 		player.intent.right = data.right;
 		player.intent.up = data.up;
 		player.intent.down = data.down;
+		player.intent.click = data.click;
 		player.angle = data.angle;
+		player.bag.selected = data.selected;
 	});
 
 	socket.on('disconnect', function() {
 		areas.removePlayer(socket.id);
+		console.log("Disconnected socket  " + socket.id);
 	});
+	
 });
 
 function newPlayer(socket) {
 	areas.moveSocketTo(socket, 'default', function(socketID) {
 		//Send the player the map data
 		io.sockets.connected[socket.id].emit('mapdata', areas.getAreaOfSocketID(socketID).textureMap);
-		console.log("Sent map data to " + socket.id);
+		console.log("New player on socket " + socket.id);
 	});
 }
 
-//Update loop function
+//
+// Update lööp
+//
 var lastUpdateTime = (new Date()).getTime();
 setInterval(function() {
 	//Calculate how much time has elapsed
 	var currentTime = (new Date()).getTime();
 	var deltaT = (currentTime - lastUpdateTime) / 1000.0;
+	var timeElapsedMilliseconds = deltaT * 1000;
 	lastUpdateTime = currentTime;
 
 	//Update every player in every area
@@ -83,6 +100,8 @@ setInterval(function() {
 			for(var socketID in area.players) {
 				if(area.players.hasOwnProperty(socketID)) {
 					var player = area.players[socketID];
+
+					player.update(timeElapsedMilliseconds);
 
 					if(player.intent.left) {player.x -= 300 * deltaT;}
 					if(player.intent.up) {player.y -= 300 * deltaT;}
@@ -97,11 +116,11 @@ setInterval(function() {
 					player.x = updatedCoord.x;
 					player.y = updatedCoord.y;
 			
-					io.sockets.connected[socketID].emit('updateCenter', {x:player.x, y:player.y});
+					io.sockets.connected[socketID].emit('returnPlayerState', {x:player.x, y:player.y, bag:{contents:player.bag.contents}});
 				}
 			}
 		}
 
-		io.to(areaID).emit('state', areas.getAreaByID(areaID).players);
+		io.to(areaID).emit('areaState', areas.getAreaByID(areaID).players);
 	});
 }, 1000 / 60);

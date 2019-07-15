@@ -5,8 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./src/server.js",
-    "build": "tsc"
+    "start": "npm run build && npm run copy && npm run run",
+    "run": "node ./build/server.js",
+    "build": "tsc",
+    "copy": "copyfiles -u 1 -e src/**/*.ts src/**/* build"
   },
   "repository": {
     "type": "git",
@@ -19,10 +21,13 @@
   },
   "homepage": "https://github.com/felixlapierre1/node-game#readme",
   "dependencies": {
-    "express": "^4.16.3",
-    "socket.io": "^2.1.1"
+    "express": "^4.16.3"
   },
   "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/node": "^12.6.3",
+    "copyfiles": "^2.1.1",
+    "socket.io": "^2.2.0",
     "typescript": "^3.5.3"
   }
 }

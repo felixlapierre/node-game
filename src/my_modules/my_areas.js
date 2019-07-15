@@ -36,9 +36,9 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
     //TODO: Load maps
 
     //NOTE: this might be incorrect pathing
-    map.loadTextureMap("./maps/" + areaID + ".txt", function(data) {
+    map.loadTextureMap("./src/maps/" + areaID + ".txt", function(data) {
       areas[areaID].textureMap = data;
-      map.loadWallMap("./maps/" + areaID + "_walls.txt", function(data) {
+      map.loadWallMap("./src/maps/" + areaID + "_walls.txt", function(data) {
         areas[areaID].wallMap = data;
         areas[areaID].loaded = true;
         //Give the map to everyone in the room

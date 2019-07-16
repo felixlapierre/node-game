@@ -2,21 +2,20 @@
 // Dependencies
 //
 import * as express from 'express';
-
-const http = require('http');
-const path = require('path');
-const socketIO = require('socket.io');
+import * as http from 'http';
+import * as path from 'path';
+import * as socketIO from 'socket.io';
 
 //My module Dependencies
-const collision = require('./my_modules/my_collision.js');
-const areas = require('./my_modules/my_areas.js');
+import * as collision from './my_modules/my_collision.js';
+import * as areas from './my_modules/my_areas.js';
 
 //
 // Set Up Server
 //
 
 var app = express();
-var server = http.Server(app);
+var server = new http.Server(app);
 var io = socketIO(server);
 
 var portNumber = 5000;

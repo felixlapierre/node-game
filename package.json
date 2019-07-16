@@ -1,7 +1,7 @@
 {
   "name": "game",
   "version": "1.0.0",
-  "description": "",
+  "description": "Online multiplayer survival game made using Javascript, Node.js, Sockets.io, Express. \r 2018",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -9,16 +9,14 @@ By Felix Lapierre and Jun Loke
 Make sure you have node.js installed on your system.
 In the folder containing the repo, run the following commands:
 
-npm init
+npm install
 
-npm install --save express socket.io
-
-This will install Express and Socket.io and all of their dependencies in the folder, which are necessary to run the server.
+This will install all of the dependencies in the folder, which are necessary to run the server.
 To turn on the server, execute the following command in the folder containing the repo:
 
-node server.js
+npm run start
 
-This will start a server on port 5000 of your computer. The port used can be changed by modifying server.js
+This will start a server on port 5000 of your computer. The port used can be changed by modifying server.ts
 To connect to the server from the same computer, open a web browser and enter the following into your address bar:
 
 localhost:5000

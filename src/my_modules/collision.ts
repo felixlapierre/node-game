@@ -1,8 +1,9 @@
 const TILE_SIZE = 50;
 const HALF_TILE = 25;
-/*collide
-returns an object containing the x-y coordinates of player AFTER collision resolution
-*/
+
+/**
+ * Calculate the coordinates of player after collision with a single wall.
+ */
 function wallCollide(playerX, playerY, obstacleX, obstacleY) {
   var newLocation = {x: playerX, y: playerY};
   var deltaX = playerX - obstacleX;
@@ -33,23 +34,19 @@ function wallCollide(playerX, playerY, obstacleX, obstacleY) {
     }
   }
   return newLocation;
-}//end of function
+}
 
-
-/*
-Collision check
-Uses player location to determine which locations on wallMap to check
-If collision, invoke wallCollide
-returns new coordinates of player
-*/
-
-function wallCheck(wallMap, playerX, playerY){
-
+/**
+ * Calculates the new coordinates of the player after colliding with a wall.
+ * @param wallMap The map of walls to be checked
+ * @param playerX The X coordinate of the player
+ * @param playerY The Y coordinate of the player
+ */
+export function wallCheck(wallMap, playerX, playerY){
   var newLocation = {
     x: playerX,
     y: playerY
   };
-
 
   var playerTile = {
     x: Math.floor((playerX-HALF_TILE)/TILE_SIZE),
@@ -67,13 +64,14 @@ function wallCheck(wallMap, playerX, playerY){
   }
   return newLocation;
 }
-module.exports.wallCheck = wallCheck;
 
-/*
-boundsCheck
-checks if player is out of bounds. If out of bounds, player is pushed to closest
-*/
-function boundsCheck(playerX, playerY, bounds){
+/**
+ * Returns the coordinates of the player after colliding with the bounds of the level.
+ * @param playerX The X coordinate of the player
+ * @param playerY The Y coordinate of the player
+ * @param bounds The bounds of the level
+ */
+export function boundsCheck(playerX, playerY, bounds){
   var coordinates= {x: playerX, y: playerY};
   // check horizontal
   if (playerX<HALF_TILE){
@@ -90,4 +88,3 @@ function boundsCheck(playerX, playerY, bounds){
   }
   return coordinates;
 }
-module.exports.boundsCheck = boundsCheck;

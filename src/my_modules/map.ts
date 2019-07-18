@@ -1,8 +1,15 @@
 const fs = require('fs');
 
-const tileSize = 50;
+export interface Tile {
+  sourceX: number,
+  sourceY: number,
+  destX0: number,
+  destY0: number,
+  destX1: number,
+  destY1: number
+}
 
-function loadTextureMap(path, callback) {
+export function loadTextureMap(path, callback) {
   fs.readFile(path, function(err, data) {
     if(err) {
       console.log(err);
@@ -19,7 +26,7 @@ export interface TextureMap {
     y: number
   }
   spritesheet: string,
-  tiles: Array<any>
+  tiles: Array<Tile>
 }
 
 function readTextureMap(data) {
@@ -53,7 +60,7 @@ function readTextureMap(data) {
   return returned;
 }
 
-function loadWallMap(path, callback) {
+export function loadWallMap(path, callback) {
   fs.readFile(path, function(err,data) {
     if(err) {
       console.log(err);
@@ -69,7 +76,7 @@ export interface WallMap {
     x: number,
     y: number
   }
-  tiles: Array<any>
+  tiles: Array<Tile>
 }
 
 function readWallMap(data) {
@@ -105,6 +112,3 @@ function readWallMap(data) {
 
   return returned;
 }
-
-exports.loadTextureMap = loadTextureMap;
-exports.loadWallMap = loadWallMap;

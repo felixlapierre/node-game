@@ -1,9 +1,7 @@
-var exports = module.exports = {};
-
 var itemGUIDCounter = 0;
-class Item {
-  constructor(quantity) {
-    this.quantity = quantity;
+export class Item {
+  GUID: number
+  constructor(public quantity) {
     this.GUID = itemGUIDCounter++;
   }
 
@@ -12,7 +10,9 @@ class Item {
   }
 }
 
-class Weapon extends Item {
+export abstract class Weapon extends Item {
+  state: string
+  timeInState: number
   constructor(quantity, defaultState) {
     super(quantity);
     this.timeInState = 0;
@@ -29,6 +29,10 @@ class Weapon extends Item {
     this.timeInState = 0;
     this.state = newState;
   }
+
+  abstract updateState(selected, click, elapsedTime);
+
+  abstract createTextureFromState();
 }
 
 /*
@@ -42,7 +46,9 @@ class Weapon extends Item {
 const lengthSwing = 300;
 const minSwingBack = 0;
 const perfectSwingBack = 1500;
-class Sword extends Weapon {
+export class Sword extends Weapon {
+  maxdamage: number
+  damageFactor: number
   constructor() {
     super(1, "sheathed");
     this.timeInState = 0;
@@ -109,16 +115,37 @@ class Sword extends Weapon {
     }
   }
 }
+interface Rectangle {
+  x: number,
+  y: number,
+  w: number,
+  h: number
+}
 
-class PlayerLockedTexture {
+export class PlayerLockedTexture {
+  sprite: any
+  source: Rectangle
+  dest: Rectangle
+  angle: number
+  rotateWithPlayer: boolean
   constructor(sprite, source, dest, angle, rotateWithPlayer) {
     this.sprite = sprite;
-    this.source = {};
+    this.source = {
+      x: source.x,
+      y: source.y,
+      w: source.w,
+      h: source.h
+    };
     this.source.x = source.x;
     this.source.y = source.y;
     this.source.w = source.w;
     this.source.h = source.h;
-    this.dest = {};
+    this.dest = {
+      x: dest.x,
+      y: dest.y,
+      w: dest.w,
+      h: dest.h
+    };
     this.dest.x = dest.x;
     this.dest.y = dest.y;
     this.dest.w = dest.w;
@@ -128,11 +155,10 @@ class PlayerLockedTexture {
   }
 }
 /*
+  TODO:
   Using an item
   Left clicking will cause a different effect depending on the TYPE of the item
 
   key     => will unlock interactable if within range (to open must use right click)
   potion  => will consume, increase HP & invoke removeOne()
 */
-
-exports.createSword = () => { return new Sword() };

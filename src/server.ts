@@ -7,8 +7,8 @@ import * as path from 'path';
 import * as socketIO from 'socket.io';
 
 //My module Dependencies
-import * as collision from './my_modules/my_collision.js';
-import * as areas from './my_modules/my_areas.js';
+const collision = require('./my_modules/collision');
+const areas = require('./my_modules/areas');
 
 //
 // Set Up Server

@@ -1,10 +1,9 @@
-var exports = module.exports = {};
-const map = require('./my_map.js');
-const PLAYER = require('./my_player.js');
+const map = require('./map');
+import { Player } from './player';
 var areas = {};
 var socket_rooms = {};
 
-function moveSocketTo(socket, areaID, callToDeliverMap) {
+export function moveSocketTo(socket, areaID, callToDeliverMap) {
 
   var previousAreaID = socket_rooms[socket.id];
   if(previousAreaID != undefined) {
@@ -32,7 +31,7 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
       textureMap: undefined,
       wallMap: undefined
     }
-    areas[areaID].players[socket.id] = PLAYER.create();
+    areas[areaID].players[socket.id] = new Player(300, 300);
     //TODO: Load maps
 
     //NOTE: this might be incorrect pathing
@@ -48,34 +47,28 @@ function moveSocketTo(socket, areaID, callToDeliverMap) {
       });
     });
   } else {
-    areas[areaID].players[socket.id] = PLAYER.create();
+    areas[areaID].players[socket.id] = new Player(300, 300);
   }
   if(areas[areaID].loaded) {
     callToDeliverMap(socket.id);
   }
 }
 
-function getAreaOfSocketID(socketID) {
+export function getAreaOfSocketID(socketID) {
   return areas[socket_rooms[socketID]];
 }
 
-function getAreaByID(areaID) {
+export function getAreaByID(areaID) {
   return areas[areaID];
 }
 
-function removePlayer(socketID) {
+export function removePlayer(socketID) {
   delete areas[socket_rooms[socketID]].players[socketID];
   delete socket_rooms[socketID];
 }
 
-function forEachAreaID(callback) {
+export function forEachAreaID(callback) {
   for(var areaID in areas) {
     callback(areaID);
   }
 }
-
-exports.moveSocketTo = moveSocketTo;
-exports.getAreaOfSocketID = getAreaOfSocketID;
-exports.getAreaByID = getAreaByID;
-exports.removePlayer = removePlayer;
-exports.forEachAreaID = forEachAreaID;

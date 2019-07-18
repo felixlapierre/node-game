@@ -52,8 +52,8 @@ function wallCheck(wallMap, playerX, playerY){
 
 
   var playerTile = {
-    x: (playerX-HALF_TILE)/TILE_SIZE,
-    y: (playerY-HALF_TILE)/TILE_SIZE
+    x: Math.floor((playerX-HALF_TILE)/TILE_SIZE),
+    y: Math.floor((playerY-HALF_TILE)/TILE_SIZE)
   };
 
   //check boxes for walls

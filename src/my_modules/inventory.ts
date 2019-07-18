@@ -1,10 +1,11 @@
+import { Item } from './items';
 /*
 Bag is an array with 9 items visible on screen
 Selection item index is determined by 'selected' and changes with scroll
 Selected item can be used via left click
 */
 export class Bag {
-  contents: Array<any>
+  contents: Array<Item>
   selected: number
   constructor() {
     this.contents = [],
@@ -16,20 +17,15 @@ export class Bag {
    * if item is already in inventory, take item and increase quantity;
    * if inventory is full, tell user and return false; DO NOT TAKE item
    * if item is not in inventory, take item add new item in new slot
-   * @param item The item to be picked up
+   * @param {Item} item The item to be picked up
    * @return {Boolean} A boolean indicating whether the pickup was successful or not
    */
-  pickUp(item) {
+  pickUp(item: Item) {
     for (var i = 0; i<9; i++){
       if(typeof this.contents[i] === 'undefined')
       {
         // no item at index i
-        this.contents[i] = {
-          name: item.name,
-          type: item.type,
-          use: item.use,
-          quantity: 1
-        };
+        this.contents[i] = item;
         return true;
       }
       else {

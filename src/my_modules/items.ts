@@ -1,20 +1,18 @@
 var itemGUIDCounter = 0;
-export class Item {
+export abstract class Item {
   GUID: number
-  constructor(public quantity) {
+  constructor(public name: string, public quantity: number) {
     this.GUID = itemGUIDCounter++;
   }
 
-  update(selected, click, elapsedTime, textures) {
-    //Override this method to define item behaviour
-  }
+  abstract update(selected, click, elapsedTime, textures);
 }
 
 export abstract class Weapon extends Item {
   state: string
   timeInState: number
-  constructor(quantity, defaultState) {
-    super(quantity);
+  constructor(public name: string, public quantity: number, defaultState: string) {
+    super(name, quantity);
     this.timeInState = 0;
     this.state = defaultState;
   }
@@ -25,7 +23,7 @@ export abstract class Weapon extends Item {
     textures[this.GUID] = this.createTextureFromState(); //Define this method in derived class
   }
 
-  setState(newState) {
+  setState(newState: string) {
     this.timeInState = 0;
     this.state = newState;
   }
@@ -50,7 +48,7 @@ export class Sword extends Weapon {
   maxdamage: number
   damageFactor: number
   constructor() {
-    super(1, "sheathed");
+    super('Sword', 1, "sheathed");
     this.timeInState = 0;
     this.maxdamage = 30;
     this.damageFactor = 1;

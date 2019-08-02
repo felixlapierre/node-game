@@ -1,8 +1,8 @@
-var itemGUIDCounter = 0;
 export abstract class Item {
   GUID: number
+  private static GUIDCounter: number
   constructor(public name: string, public quantity: number) {
-    this.GUID = itemGUIDCounter++;
+    this.GUID = Item.GUIDCounter++;
   }
 
   abstract update(selected, click, elapsedTime, textures);
@@ -44,6 +44,7 @@ export abstract class Weapon extends Item {
 const lengthSwing = 300;
 const minSwingBack = 0;
 const perfectSwingBack = 1500;
+
 export class Sword extends Weapon {
   maxdamage: number
   damageFactor: number
@@ -54,7 +55,7 @@ export class Sword extends Weapon {
     this.damageFactor = 1;
   }
 
-  updateState(selected, click, elapsedTime) {
+  updateState(selected, click) {
     //State machine for sword
     switch (this.state) {
 
@@ -121,35 +122,12 @@ interface Rectangle {
 }
 
 export class PlayerLockedTexture {
-  sprite: any
-  source: Rectangle
-  dest: Rectangle
-  angle: number
-  rotateWithPlayer: boolean
-  constructor(sprite, source, dest, angle, rotateWithPlayer) {
-    this.sprite = sprite;
-    this.source = {
-      x: source.x,
-      y: source.y,
-      w: source.w,
-      h: source.h
-    };
-    this.source.x = source.x;
-    this.source.y = source.y;
-    this.source.w = source.w;
-    this.source.h = source.h;
-    this.dest = {
-      x: dest.x,
-      y: dest.y,
-      w: dest.w,
-      h: dest.h
-    };
-    this.dest.x = dest.x;
-    this.dest.y = dest.y;
-    this.dest.w = dest.w;
-    this.dest.h = dest.h;
-    this.angle = angle;
-    this.rotateWithPlayer = rotateWithPlayer;
+  constructor(
+    public sprite: any,
+    public source: Rectangle,
+    public dest: Rectangle,
+    public angle: number,
+    public rotateWithPlayer: boolean) {
   }
 }
 /*

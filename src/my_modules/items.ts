@@ -1,20 +1,18 @@
-var exports = module.exports = {};
-
-var itemGUIDCounter = 0;
-class Item {
-  constructor(quantity) {
-    this.quantity = quantity;
-    this.GUID = itemGUIDCounter++;
+export abstract class Item {
+  GUID: number
+  private static GUIDCounter: number
+  constructor(public name: string, public quantity: number) {
+    this.GUID = Item.GUIDCounter++;
   }
 
-  update(selected, click, elapsedTime, textures) {
-    //Override this method to define item behaviour
-  }
+  abstract update(selected, click, elapsedTime, textures);
 }
 
-class Weapon extends Item {
-  constructor(quantity, defaultState) {
-    super(quantity);
+export abstract class Weapon extends Item {
+  state: string
+  timeInState: number
+  constructor(public name: string, public quantity: number, defaultState: string) {
+    super(name, quantity);
     this.timeInState = 0;
     this.state = defaultState;
   }
@@ -25,10 +23,14 @@ class Weapon extends Item {
     textures[this.GUID] = this.createTextureFromState(); //Define this method in derived class
   }
 
-  setState(newState) {
+  setState(newState: string) {
     this.timeInState = 0;
     this.state = newState;
   }
+
+  abstract updateState(selected, click, elapsedTime);
+
+  abstract createTextureFromState();
 }
 
 /*
@@ -42,15 +44,18 @@ class Weapon extends Item {
 const lengthSwing = 300;
 const minSwingBack = 0;
 const perfectSwingBack = 1500;
-class Sword extends Weapon {
+
+export class Sword extends Weapon {
+  maxdamage: number
+  damageFactor: number
   constructor() {
-    super(1, "sheathed");
+    super('Sword', 1, "sheathed");
     this.timeInState = 0;
     this.maxdamage = 30;
     this.damageFactor = 1;
   }
 
-  updateState(selected, click, elapsedTime) {
+  updateState(selected, click) {
     //State machine for sword
     switch (this.state) {
 
@@ -109,30 +114,27 @@ class Sword extends Weapon {
     }
   }
 }
+interface Rectangle {
+  x: number,
+  y: number,
+  w: number,
+  h: number
+}
 
-class PlayerLockedTexture {
-  constructor(sprite, source, dest, angle, rotateWithPlayer) {
-    this.sprite = sprite;
-    this.source = {};
-    this.source.x = source.x;
-    this.source.y = source.y;
-    this.source.w = source.w;
-    this.source.h = source.h;
-    this.dest = {};
-    this.dest.x = dest.x;
-    this.dest.y = dest.y;
-    this.dest.w = dest.w;
-    this.dest.h = dest.h;
-    this.angle = angle;
-    this.rotateWithPlayer = rotateWithPlayer;
+export class PlayerLockedTexture {
+  constructor(
+    public sprite: any,
+    public source: Rectangle,
+    public dest: Rectangle,
+    public angle: number,
+    public rotateWithPlayer: boolean) {
   }
 }
 /*
+  TODO:
   Using an item
   Left clicking will cause a different effect depending on the TYPE of the item
 
   key     => will unlock interactable if within range (to open must use right click)
   potion  => will consume, increase HP & invoke removeOne()
 */
-
-exports.createSword = () => { return new Sword() };

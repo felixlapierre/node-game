@@ -141,7 +141,7 @@ function getTexture(source) {
 	}
 }
 
-socket.on('areaState', function(players) {
+socket.on('areaState', function(state) {
 	canvasContext.clearRect(0, 0, 800, 600);
 	canvasContext.fillStyle = 'green';
 
@@ -157,9 +157,13 @@ socket.on('areaState', function(players) {
 			}
 	}
 
-	for(var id in players) {
-		drawPlayer(players[id]);
+	for(var id in state.players) {
+		drawPlayer(state.players[id]);
 	}
+
+	state.enemies.forEach((enemy) => {
+		drawPlayer(enemy);
+	})
 
 	//Determine the location at which the bag will be drawn
 	var left = canvas.clientWidth / 2 - (tileSize * 4.5);
@@ -199,7 +203,6 @@ function drawPlayer(player) {
 	canvasContext.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
 	canvasContext.restore();
 
-	console.log(player.textures);
 	for(var jd in player.textures) {
 		var img = player.textures[jd];
 		canvasContext.save();

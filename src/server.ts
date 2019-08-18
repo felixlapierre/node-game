@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as socketIO from 'socket.io';
 
 //My module Dependencies
-import * as World from './my_modules/areas';
+import * as World from './my_modules/World';
 
 //
 // Set Up Server
@@ -21,6 +21,7 @@ var portNumber = 5000;
 
 app.set('port', portNumber);
 app.use('/static', express.static(__dirname + '/static'));
+app.use('/src/static', express.static(__dirname + '/../src/static'));
 
 //Routing
 app.get('/', function(request, response) {

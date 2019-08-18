@@ -1,5 +1,6 @@
 import {Bag} from './inventory';
 import {Sword} from './items';
+import { Point } from './Utils/Geometry';
 
 export interface Intent {
     left: boolean,
@@ -9,8 +10,8 @@ export interface Intent {
     click: boolean
 }
 export class Player {
-    x: number;
-    y: number;
+    private x: number;
+    private y: number;
     angle: number;
     intent: Intent;
     textures: any;
@@ -36,5 +37,14 @@ export class Player {
         for(var i in this.bag.contents) {
             this.bag.contents[i].update(parseInt(i) == this.bag.selected, this.intent.click, elapsedTime, this.textures);
         }
+    }
+
+    getCenter() {
+        return new Point(this.x, this.y);
+    }
+
+    setCenter(point: Point) {
+        this.x = point.x;
+        this.y = point.y;
     }
 }

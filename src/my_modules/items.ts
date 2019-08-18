@@ -2,7 +2,7 @@ import { Rectangle, Point } from './Utils/Geometry';
 
 export abstract class Item {
   GUID: number
-  private static GUIDCounter: number
+  private static GUIDCounter: number = 0;
   constructor(public name: string, public quantity: number) {
     this.GUID = Item.GUIDCounter++;
   }

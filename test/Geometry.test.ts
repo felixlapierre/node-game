@@ -99,6 +99,26 @@ describe('Rectangle', () => {
             expect(r1.Overlaps(r2)).to.be.false;
         })
     })
+
+    describe('Circle Overlap', () => {
+        it('should overlap if the shapes are overlapping', () => {
+            const rectangle = new Rectangle(new Point(0, 0), new Point(7, 5));
+            const circle = new Circle(new Point(3, 6), 3);
+            expect(rectangle.Overlaps(circle)).to.be.true;
+        })
+
+        it('should not overlap if the shapes are not overlapping', () => {
+            const rectangle = new Rectangle(new Point(0, 0), new Point(7, 5));
+            const circle = new Circle(new Point(10, 10), 2);
+            expect(rectangle.Overlaps(circle)).to.be.false;
+        })
+
+        it('should not overlap if the shapes are touching edges', () => {
+            const rectangle = new Rectangle(new Point(0, 0), new Point(7, 5));
+            const circle = new Circle(new Point(3, 6), 1);
+            expect(rectangle.Overlaps(circle)).to.be.false;
+        })
+    })
 })
 
 describe('Circle', () => {

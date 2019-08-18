@@ -2,6 +2,18 @@ export interface Shape {
     Overlaps(shape: Shape): boolean;
 }
 
+export function Distance(point1: Point, point2: Point) {
+    const deltaX = point2.x - point1.x;
+    const deltaY = point2.y - point1.y;
+    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+}
+
+class NoOverlapFunctionFoundError extends Error {
+    constructor(shape1: Shape, shape2: Shape) {
+        super(`No overlap function found between shapes ${shape1.constructor.name} and ${shape2.constructor.name}`);
+    }
+}
+
 export class Point implements Shape {
     constructor(public x: number, public y: number) { }
 
@@ -94,17 +106,20 @@ function CircleCircleOverlap(c1: Circle, c2: Circle) {
 }
 
 function CircleRectangleOverlap(circle: Circle, rectangle: Rectangle) {
-    return false;
-}
+    /**
+     * Get the point in the rectangle that is closest to the circle. If
+     * that point is in the circle, they are overlapping.
+     */
+    const closest = new Point(circle.center.x, circle.center.y);
 
-export function Distance(point1: Point, point2: Point) {
-    const deltaX = point2.x - point1.x;
-    const deltaY = point2.y - point1.y;
-    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-}
-
-class NoOverlapFunctionFoundError extends Error {
-    constructor(shape1: Shape, shape2: Shape) {
-        super(`No overlap function found between shapes ${shape1.constructor.name} and ${shape2.constructor.name}`);
-    }
+    if(circle.center.x < rectangle.Left())
+        closest.x = rectangle.Left();
+    else if(circle.center.x > rectangle.Right())
+        closest.x = rectangle.Right();
+    if(circle.center.y < rectangle.Bottom())
+        closest.y = rectangle.Bottom();
+    else if(circle.center.y > rectangle.Top())
+        closest.y = rectangle.Top();
+    
+    return PointCircleOverlap(closest, circle);
 }

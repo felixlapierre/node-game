@@ -43,27 +43,11 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('movement', function(data) {
-		var currentArea = areas.getAreaOfSocketID(socket.id);
-		if(currentArea == undefined) {
-			//Player is not registered as being in an area
+		try {
+			areas.onPlayerIntentChanged(data, socket.id);
+		} catch(e) {
 			newPlayer(socket);
-			return;
 		}
-		var player = currentArea.players[socket.id] || {};
-
-		if(currentArea.loaded == false) {
-			//NOTE: Debug statement
-			console.log("Current area not loaded.");
-			return;
-		}
-
-		player.intent.left = data.left;
-		player.intent.right = data.right;
-		player.intent.up = data.up;
-		player.intent.down = data.down;
-		player.intent.click = data.click;
-		player.angle = data.angle;
-		player.bag.selected = data.selected;
 	});
 
 	socket.on('disconnect', function() {
@@ -93,33 +77,5 @@ setInterval(function() {
 	lastUpdateTime = currentTime;
 
 	//Update every player in every area
-	areas.forEachAreaID((areaID) => {
-		var area = areas.getAreaByID(areaID);
-		if(area.loaded == true) {
-			for(var socketID in area.players) {
-				if(area.players.hasOwnProperty(socketID)) {
-					var player = area.players[socketID];
-
-					player.update(timeElapsedMilliseconds);
-
-					if(player.intent.left) {player.x -= 300 * deltaT;}
-					if(player.intent.up) {player.y -= 300 * deltaT;}
-					if(player.intent.right) {player.x += 300 * deltaT}
-					if(player.intent.down) {player.y += 300 * deltaT;}
-			
-					// collision checks
-					var updatedCoord= collision.boundsCheck(player.x, player.y, area.wallMap.bounds);
-					player.x = updatedCoord.x;
-					player.y = updatedCoord.y;
-					updatedCoord = collision.wallCheck(area.wallMap.tiles,player.x, player.y);
-					player.x = updatedCoord.x;
-					player.y = updatedCoord.y;
-			
-					io.sockets.connected[socketID].emit('returnPlayerState', {x:player.x, y:player.y, bag:{contents:player.bag.contents}});
-				}
-			}
-		}
-
-		io.to(areaID).emit('areaState', areas.getAreaByID(areaID).players);
-	});
+	areas.updateAllAreas(timeElapsedMilliseconds, io);
 }, 1000 / 60);

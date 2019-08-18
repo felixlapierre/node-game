@@ -1,15 +1,15 @@
 import { TextureMap, WallMap } from "./map";
 import { Player } from "./player";
-var areas = {};
+import { Area } from './Area';
+var areas = new Map<string, Area>();
 var socket_rooms = {};
 
 export function moveSocketTo(socket, areaID, callToDeliverMap) {
   var previousAreaID = socket_rooms[socket.id];
   if (previousAreaID != undefined) {
-    //If leaving the previous area will empty it, unload the previous area
-    //(TODO: make them persist a bit?)
-    if (Object.keys(areas[previousAreaID].players).length == 1) {
-      delete areas[previousAreaID];
+    areas.get(previousAreaID).removePlayer(socket.id);
+    if (areas.get(previousAreaID).isEmpty()) {
+      areas.delete(previousAreaID);
     }
 
     //Remove socket from the room it was in previously
@@ -21,54 +21,48 @@ export function moveSocketTo(socket, areaID, callToDeliverMap) {
   socket_rooms[socket.id] = areaID;
 
   //If new room was empty, load the room
-  if (!areas.hasOwnProperty(areaID)) {
+  if (!areas.has(areaID)) {
     //Create the new area
-    areas[areaID] = {
-      players: {},
-      loaded: false,
-      textureMap: undefined,
-      wallMap: undefined
-    };
-    areas[areaID].players[socket.id] = new Player(300, 300);
-
-    //NOTE: this might be incorrect pathing
-    Promise.all([
-      TextureMap.load("./src/maps/" + areaID + ".txt"),
-      WallMap.load("./src/maps/" + areaID + "_walls.txt")
-    ])
-    .then(([textureMap, wallMap]) => {
-      areas[areaID].textureMap = textureMap;
-      areas[areaID].wallMap = wallMap;
-      areas[areaID].loaded = true;
-
-      //Give the map to everyone in the room
-      for (var player in areas[areaID].players) {
-        callToDeliverMap(player);
-      }
-    });
+    areas.set(areaID, new Area(areaID, callToDeliverMap));
+    areas.get(areaID).newPlayer(socket.id);
   } else {
-    areas[areaID].players[socket.id] = new Player(300, 300);
+    areas.get(areaID).newPlayer(socket.id);
   }
-  if (areas[areaID].loaded) {
+  if (areas.get(areaID).loaded) {
     callToDeliverMap(socket.id);
   }
 }
 
 export function getAreaOfSocketID(socketID) {
-  return areas[socket_rooms[socketID]];
+  return areas.get(socket_rooms[socketID]);
 }
 
 export function getAreaByID(areaID) {
-  return areas[areaID];
+  return areas.get(areaID);
 }
 
 export function removePlayer(socketID) {
-  delete areas[socket_rooms[socketID]].players[socketID];
+  areas.get(socket_rooms[socketID]).removePlayer(socketID);
   delete socket_rooms[socketID];
 }
 
 export function forEachAreaID(callback) {
-  for (var areaID in areas) {
-    callback(areaID);
+  areas.forEach((value, key, map) => {
+    callback(key);
+  })
+}
+
+export function updateAllAreas(elapsedTime: number, io: SocketIO.Server) {
+  areas.forEach((area, ID, map) => {
+    area.update(elapsedTime, io);
+  })
+}
+
+export function onPlayerIntentChanged(data, playerID: string) {
+  const area = areas.get(socket_rooms[playerID]);
+  if(area) {
+    area.setPlayerIntent(playerID, data);
+  } else {
+    throw new Error('Cannot update intent of player that is not in a room');
   }
 }

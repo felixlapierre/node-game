@@ -102,13 +102,11 @@ export class Sword extends Weapon {
         return new PlayerLockedTexture("static/Slash.png",
           new Rectangle(
             new Point(Math.floor(this.timeInState / (lengthSwing / 5)) * 56, 0),
-            56,
-            66
+            new Point(56, 66)
           ),
           new Rectangle(
             new Point(-56 / 2, -66),
-            56,
-            66
+            new Point(56, 66)
           ),
           0, true);
     }

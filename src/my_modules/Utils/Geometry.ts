@@ -35,7 +35,7 @@ function PointRectangleOverlap(point: Point, rectangle: Rectangle) {
 }
 
 export class Rectangle implements Shape {
-    constructor(public corner: Point, public width: number, public height: number) { }
+    constructor(public corner: Point, public size: Point) { }
 
     Overlaps(shape: Shape) {
         if (shape instanceof Point) {
@@ -52,9 +52,9 @@ export class Rectangle implements Shape {
 
     Left() { return this.corner.x }
 
-    Right() { return this.corner.x + this.width; }
+    Right() { return this.corner.x + this.size.x; }
 
-    Top() { return this.corner.y + this.height }
+    Top() { return this.corner.y + this.size.y }
 
     Bottom() { return this.corner.y }
 

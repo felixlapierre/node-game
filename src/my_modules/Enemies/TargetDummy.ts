@@ -18,6 +18,7 @@ export class TargetDummy extends Enemy {
         this.y = location.y;
         this.angle = 0;
         this.textures = {};
+        this.textures.self = new Sprite(0, 0, 0, "TargetDummy", "standing");
         this.health = 100;
     }
 
@@ -27,7 +28,9 @@ export class TargetDummy extends Enemy {
 
     getDisplayInfo() {
         return {
-            ...new Sprite(this.x, this.y, this.angle, "TargetDummy"),
+            x: this.x,
+            y: this.y,
+            angle: this.angle,
             sprites: this.textures
         }
     }

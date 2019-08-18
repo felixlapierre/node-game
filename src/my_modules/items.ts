@@ -1,3 +1,5 @@
+import { Rectangle, Point } from './Utils/Geometry';
+
 export abstract class Item {
   GUID: number
   private static GUIDCounter: number
@@ -98,27 +100,19 @@ export class Sword extends Weapon {
 
       case "swinging":
         return new PlayerLockedTexture("static/Slash.png",
-          {
-            x: Math.floor(this.timeInState / (lengthSwing / 5)) * 56,
-            y: 0,
-            w: 56,
-            h: 66
-          },
-          {
-            x: -56/2,
-            y:-66,
-            w:56,
-            h:66
-          },
+          new Rectangle(
+            new Point(Math.floor(this.timeInState / (lengthSwing / 5)) * 56, 0),
+            56,
+            66
+          ),
+          new Rectangle(
+            new Point(-56 / 2, -66),
+            56,
+            66
+          ),
           0, true);
     }
   }
-}
-interface Rectangle {
-  x: number,
-  y: number,
-  w: number,
-  h: number
 }
 
 export class PlayerLockedTexture {

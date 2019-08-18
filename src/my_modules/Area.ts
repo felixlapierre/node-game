@@ -53,7 +53,7 @@ export class Area {
             return;
         const payload = {
             players: {},
-            enemies: this.enemies
+            enemies: []
         };
 
         this.players.forEach((player, socketID, map) => {
@@ -73,13 +73,14 @@ export class Area {
 
             player.setCenter(newCenter);
 
-            payload.players[socketID] = player;
+            payload.players[socketID] = player.GetDisplayInfo();
 
             io.sockets.connected[socketID].emit('returnPlayerState', {x:newCenter.x, y:newCenter.y, bag:{contents:player.bag.contents}});
         })
 
         this.enemies.forEach((enemy) => {
             enemy.Update(elapsedTime);
+            payload.enemies.push(enemy.getDisplayInfo());
         })
 
         io.to(this.ID).emit('areaState', payload);

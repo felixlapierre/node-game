@@ -1,6 +1,7 @@
 import {Bag} from './inventory';
 import {Sword} from './items';
 import { Point } from './Utils/Geometry';
+import { Sprite } from './Sprite';
 
 export interface Intent {
     left: boolean,
@@ -46,5 +47,12 @@ export class Player {
     setCenter(point: Point) {
         this.x = point.x;
         this.y = point.y;
+    }
+
+    GetDisplayInfo() {
+        return {
+            ...new Sprite(this.x, this.y, this.angle, "Player"),
+            sprites: this.textures
+        }
     }
 }

@@ -127,6 +127,9 @@ var spritesheet = new Image();
 var itemBar = new Image();
 itemBar.src = "static/ItemBar.png";
 
+var targetDummy = new Image();
+targetDummy.src = "static/TargetDummy.png";
+
 var textures = {};
 
 function getTexture(source) {
@@ -203,8 +206,8 @@ function drawPlayer(player) {
 	canvasContext.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
 	canvasContext.restore();
 
-	for(var jd in player.textures) {
-		var img = player.textures[jd];
+	for(var jd in player.sprites) {
+		var img = player.sprites[jd];
 		canvasContext.save();
 		canvasContext.translate(player.x - topleft.x, player.y - topleft.y);
 		if(img.rotateWithPlayer) {
@@ -217,5 +220,74 @@ function drawPlayer(player) {
 		0, 0, img.dest.size.x, img.dest.size.y);
 
 		canvasContext.restore();
+	}
+}
+interface Sprite {
+	center: {
+		x: number,
+		y: number
+	},
+	angle: number,
+	id: string,
+	animation: string
+}
+
+function drawSpriteRelativeToPlayer(player, sprite: Sprite) {
+	canvasContext.save();
+	canvasContext.translate(player.x - topleft.x, player.y - topleft.y);
+	canvasContext.rotate(player.angle + Math.PI / 2);
+	drawSprite(sprite);
+	canvasContext.restore();
+}
+
+function drawSprite(sprite: Sprite) {
+	const info = spriteTable[sprite.id];
+	const image = info.image;
+	const animation = info.animations[sprite.animation];
+	if(animation === undefined) {
+		console.log(`Animation ${sprite.animation} not found for sprite ${sprite.id}`);
+		return;
+	}
+	const sourceFrame = animation.frames[0];
+
+	canvasContext.translate(sprite.center.x, sprite.center.y);
+	canvasContext.rotate(sprite.angle + Math.PI / 2);
+	canvasContext.drawImage(image, sourceFrame.x, sourceFrame.y, info.size.x, info.size.y,
+		0, 0, info.size.x, info.size.y);
+}
+
+const spriteTable = {
+	Player: {
+		image: playerImage,
+		size: {x: 50, y: 50},
+		animations: {
+			standing: {
+				delay: -1,
+				frames: [{x: 0, y: 0}]
+			},
+			walking: {
+				delay: 100,
+				frames: [
+					{x: 50, y: 0},
+					{x: 100, y: 0},
+					{x: 150, y: 0},
+					{x: 200, y: 0}
+				]
+			}
+		}
+	},
+	TargetDummy: {
+		image: targetDummy,
+		size: {x: 50, y: 50},
+		animations: {
+			standing: {
+				delay: -1,
+				frames: [{x: 0, y: 0}]
+			},
+			hurt: {
+				delay: -1,
+				frames: [{x: 50, y: 0}]
+			}
+		}
 	}
 }

@@ -1,15 +1,16 @@
 import { Enemy } from './Enemy';
 import { Rectangle, Point } from './../Utils/Geometry';
+import { Sprite } from '../Sprite';
 
 const size = new Point(50, 50);
 
 export class TargetDummy extends Enemy {
     private health: number
 
-    x:number;
-    y:number;
-    angle:number;
-    textures:any;
+    x: number;
+    y: number;
+    angle: number;
+    textures: any;
 
     constructor(location: Point) {
         super(new Rectangle(location, size))
@@ -22,5 +23,12 @@ export class TargetDummy extends Enemy {
 
     Update(elapsedTime: number) {
         // The target dummy doesn't do a lot.
+    }
+
+    getDisplayInfo() {
+        return {
+            ...new Sprite(this.x, this.y, this.angle, "TargetDummy"),
+            sprites: this.textures
+        }
     }
 }

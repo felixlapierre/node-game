@@ -4,7 +4,7 @@ import { wallCheck, boundsCheck } from './collision';
 
 export class Area {
     private players: Map<string, Player>;
-    private textureMap: TextureMap;
+    public textureMap: TextureMap;
     private wallMap: WallMap;
     public loaded: boolean;
 
@@ -20,9 +20,9 @@ export class Area {
             this.loaded = true;
       
             //Give the map to everyone in the room
-            for (var player in this.players) {
-              onLoad(player);
-            }
+            this.players.forEach((player, id, map) => {
+                onLoad(id);
+            })
           });
     }
 

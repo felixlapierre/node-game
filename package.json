@@ -5,9 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha -r ts-node/register test/**/*.test.ts",
-    "start": "npm run build && npm run copy && npm run run",
+    "start": "npm run compile && npm run run",
     "run": "node ./build/server.js",
-    "build": "tsc",
+    "build": "npm run compile && npm run copy",
+    "compile": "tsc",
     "copy": "copyfiles -u 1 -e src/**/*.ts src/**/* build"
   },
   "repository": {

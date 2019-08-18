@@ -1,5 +1,3 @@
-import { TextureMap, WallMap } from "./map";
-import { Player } from "./player";
 import { Area } from './Area';
 var areas = new Map<string, Area>();
 var socket_rooms = {};
@@ -37,19 +35,9 @@ export function getAreaOfSocketID(socketID) {
   return areas.get(socket_rooms[socketID]);
 }
 
-export function getAreaByID(areaID) {
-  return areas.get(areaID);
-}
-
 export function removePlayer(socketID) {
   areas.get(socket_rooms[socketID]).removePlayer(socketID);
   delete socket_rooms[socketID];
-}
-
-export function forEachAreaID(callback) {
-  areas.forEach((value, key, map) => {
-    callback(key);
-  })
 }
 
 export function updateAllAreas(elapsedTime: number, io: SocketIO.Server) {

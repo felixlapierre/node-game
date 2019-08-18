@@ -7,8 +7,7 @@ import * as path from 'path';
 import * as socketIO from 'socket.io';
 
 //My module Dependencies
-const collision = require('./my_modules/collision');
-const areas = require('./my_modules/areas');
+import * as World from './my_modules/areas';
 
 //
 // Set Up Server
@@ -44,23 +43,23 @@ io.on('connection', function(socket) {
 
 	socket.on('movement', function(data) {
 		try {
-			areas.onPlayerIntentChanged(data, socket.id);
+			World.onPlayerIntentChanged(data, socket.id);
 		} catch(e) {
 			newPlayer(socket);
 		}
 	});
 
 	socket.on('disconnect', function() {
-		areas.removePlayer(socket.id);
+		World.removePlayer(socket.id);
 		console.log("Disconnected socket  " + socket.id);
 	});
 	
 });
 
 function newPlayer(socket) {
-	areas.moveSocketTo(socket, 'default', function(socketID) {
+	World.moveSocketTo(socket, 'default', function(socketID) {
 		//Send the player the map data
-		io.sockets.connected[socket.id].emit('mapdata', areas.getAreaOfSocketID(socketID).textureMap);
+		io.sockets.connected[socket.id].emit('mapdata', World.getAreaOfSocketID(socketID).textureMap);
 		console.log("New player on socket " + socket.id);
 	});
 }
@@ -77,5 +76,5 @@ setInterval(function() {
 	lastUpdateTime = currentTime;
 
 	//Update every player in every area
-	areas.updateAllAreas(timeElapsedMilliseconds, io);
+	World.updateAllAreas(timeElapsedMilliseconds, io);
 }, 1000 / 60);

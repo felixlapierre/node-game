@@ -200,11 +200,11 @@ function drawPlayer(player) {
 		if(img.rotateWithPlayer) {
 			context.rotate(player.angle + Math.PI / 2);
 		}
-		context.translate(img.dest.x, img.dest.y);
+		context.translate(img.dest.corner.x, img.dest.corner.y);
 		context.rotate(img.angle);
 		
-		context.drawImage(getTexture(img.sprite), img.source.x, img.source.y, img.source.w, img.source.h, 
-		0, 0, img.dest.w, img.dest.h);
+		context.drawImage(getTexture(img.sprite), img.source.corner.x, img.source.corner.y, img.source.size.x, img.source.size.y, 
+		0, 0, img.dest.size.x, img.dest.size.y);
 
 		context.restore();
 	}

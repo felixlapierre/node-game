@@ -1,3 +1,4 @@
+//const io = require('socket.io-client');
 var socket = io();
 const tileSize = 50;
 var topleft = {
@@ -103,11 +104,17 @@ function calculateAngle() {
 	}
 }
 
-var canvas = document.getElementById('canvas');
+interface Html5Canvas extends HTMLElement {
+	width: number;
+	height: number;
+	getContext(type: string): any;
+}
+
+var canvas = document.getElementById('canvas') as Html5Canvas;
 
 canvas.width = 800;
 canvas.height = 600;
-var context = canvas.getContext('2d');
+var canvasContext = canvas.getContext('2d');
 
 var playerImage = new Image();
 playerImage.src = "static/playerSprite1.png";
@@ -135,15 +142,15 @@ function getTexture(source) {
 }
 
 socket.on('areaState', function(players) {
-	context.clearRect(0, 0, 800, 600);
-	context.fillStyle = 'green';
+	canvasContext.clearRect(0, 0, 800, 600);
+	canvasContext.fillStyle = 'green';
 
 	if(map != undefined && spritesheet.src != undefined) {
 		for(var i = 0; i < map.tiles.length; i++) {
 			var tile = map.tiles[i];
 			for(var x = tile.destX0; x <= tile.destX1; x += tileSize) {
 				for(var y = tile.destY0; y <= tile.destY1; y += tileSize) {
-					context.drawImage(spritesheet, tile.sourceX, tile.sourceY, 50, 50,
+					canvasContext.drawImage(spritesheet, tile.sourceX, tile.sourceY, 50, 50,
 						x - topleft.x, y - topleft.y, 50, 50);
 					}
 				}
@@ -157,7 +164,7 @@ socket.on('areaState', function(players) {
 	//Determine the location at which the bag will be drawn
 	var left = canvas.clientWidth / 2 - (tileSize * 4.5);
 	var top = canvas.clientHeight - tileSize;
-	drawBag(context, left, top, itemBar)
+	drawBag(canvasContext, left, top, itemBar)
 });
 
 socket.on('mapdata', function(data) {
@@ -185,27 +192,27 @@ function drawBag(context, x, y, sprite) {
 }
 
 function drawPlayer(player) {
-	context.save();
+	canvasContext.save();
 	//TODO: Implement the screen offset
-	context.translate(player.x - topleft.x, player.y - topleft.y);
-	context.rotate(player.angle + Math.PI / 2);
-	context.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
-	context.restore();
+	canvasContext.translate(player.x - topleft.x, player.y - topleft.y);
+	canvasContext.rotate(player.angle + Math.PI / 2);
+	canvasContext.drawImage(playerImage, 0, 0, 50, 50, -50/2, -50/2, 50, 50);
+	canvasContext.restore();
 
 	console.log(player.textures);
 	for(var jd in player.textures) {
 		var img = player.textures[jd];
-		context.save();
-		context.translate(player.x - topleft.x, player.y - topleft.y);
+		canvasContext.save();
+		canvasContext.translate(player.x - topleft.x, player.y - topleft.y);
 		if(img.rotateWithPlayer) {
-			context.rotate(player.angle + Math.PI / 2);
+			canvasContext.rotate(player.angle + Math.PI / 2);
 		}
-		context.translate(img.dest.corner.x, img.dest.corner.y);
-		context.rotate(img.angle);
+		canvasContext.translate(img.dest.corner.x, img.dest.corner.y);
+		canvasContext.rotate(img.angle);
 		
-		context.drawImage(getTexture(img.sprite), img.source.corner.x, img.source.corner.y, img.source.size.x, img.source.size.y, 
+		canvasContext.drawImage(getTexture(img.sprite), img.source.corner.x, img.source.corner.y, img.source.size.x, img.source.size.y, 
 		0, 0, img.dest.size.x, img.dest.size.y);
 
-		context.restore();
+		canvasContext.restore();
 	}
 }

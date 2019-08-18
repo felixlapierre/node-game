@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/felixlapierre1/node-game#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.0",
@@ -30,6 +31,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.3",
     "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
     "chai": "^4.2.0",
     "copyfiles": "^2.1.1",
     "mocha": "^6.2.0",

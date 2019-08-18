@@ -82,15 +82,18 @@ export class Rectangle implements Shape {
 function RectangleRectangleOverlap(r1: Rectangle, r2: Rectangle) {
     // If any corner of a rectangle is inside the other rectangle, they are overlapping.
     return PointRectangleOverlap(r1.TopLeft(), r2)
-    || PointRectangleOverlap(r1.TopRight(), r2)
-    || PointRectangleOverlap(r1.BottomLeft(), r2)
-    || PointRectangleOverlap(r1.BottomRight(), r2);
+        || PointRectangleOverlap(r1.TopRight(), r2)
+        || PointRectangleOverlap(r1.BottomLeft(), r2)
+        || PointRectangleOverlap(r1.BottomRight(), r2);
 }
 
 export class Circle implements Shape {
     constructor(public center: Point, public radius: number) { }
 
     Overlaps(shape: Shape) {
+        if (shape instanceof Point) {
+            return PointCircleOverlap(shape, this);
+        }
         if (shape instanceof Rectangle) {
             return CircleRectangleOverlap(this, shape);
         }
@@ -112,14 +115,14 @@ function CircleRectangleOverlap(circle: Circle, rectangle: Rectangle) {
      */
     const closest = new Point(circle.center.x, circle.center.y);
 
-    if(circle.center.x < rectangle.Left())
+    if (circle.center.x < rectangle.Left())
         closest.x = rectangle.Left();
-    else if(circle.center.x > rectangle.Right())
+    else if (circle.center.x > rectangle.Right())
         closest.x = rectangle.Right();
-    if(circle.center.y < rectangle.Bottom())
+    if (circle.center.y < rectangle.Bottom())
         closest.y = rectangle.Bottom();
-    else if(circle.center.y > rectangle.Top())
+    else if (circle.center.y > rectangle.Top())
         closest.y = rectangle.Top();
-    
+
     return PointCircleOverlap(closest, circle);
 }

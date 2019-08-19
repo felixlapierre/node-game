@@ -25,6 +25,11 @@ var mouse = {
 	y: 0
 }
 
+interface LocalCreatureInfo {
+	creature: Creature,
+	animations: Map<string, AnimationInfo>
+}
+
 interface Creature {
 	x: number,
 	y: number,
@@ -32,8 +37,13 @@ interface Creature {
 	sprites: any
 }
 
-const players = new Map<string, Creature>();
-const enemies = new Map<string, Creature>();
+interface AnimationInfo {
+	id: string,
+	time: number
+}
+
+const players = new Map<string, LocalCreatureInfo>();
+const enemies = new Map<string, LocalCreatureInfo>();
 
 //Keyboard event listeners
 document.addEventListener('keydown', function (event) {
@@ -144,16 +154,30 @@ slash.src = "static/Slash.png";
 
 socket.on('areaState', function (state) {
 	for (var id in state.players) {
-		players.set(id, state.players[id]);
+		if (players.has(id)) {
+			players.get(id).creature = state.players[id];
+		} else {
+			players.set(id, {
+				creature: state.players[id],
+				animations: new Map<string, AnimationInfo>()
+			})
+		}
 	}
 
 	for (var id in state.enemies) {
-		enemies.set(id, state.enemies[id]);
+		if (enemies.has(id)) {
+			enemies.get(id).creature = state.enemies[id];
+		} else {
+			enemies.set(id, {
+				creature: state.enemies[id],
+				animations: new Map<string, AnimationInfo>()
+			})
+		}
 	}
 
-	if(myPlayerId && players.has(myPlayerId)) {
-		topleft.x = players.get(myPlayerId).x - canvas.width / 2;
-		topleft.y = players.get(myPlayerId).y - canvas.height / 2;
+	if (myPlayerId && players.has(myPlayerId)) {
+		topleft.x = players.get(myPlayerId).creature.x - canvas.width / 2;
+		topleft.y = players.get(myPlayerId).creature.y - canvas.height / 2;
 	}
 });
 
@@ -201,9 +225,9 @@ socket.on('mapdata', function (data) {
 	spritesheet.src = "static/" + data.spritesheet;
 });
 
-let myPlayerId; 
+let myPlayerId;
 
-socket.on('identity', function(id) {
+socket.on('identity', function (id) {
 	myPlayerId = id;
 })
 
@@ -225,8 +249,24 @@ function drawBag(context, x, y, sprite) {
 }
 
 function drawPlayer(player) {
-	for (var id in player.sprites) {
-		var sprite = player.sprites[id];
+	for (var id in player.creature.sprites) {
+		const sprite = player.creature.sprites[id];
+		if(player.animations.has(id)) {
+			const animationInfo = player.animations.get(id);
+			if(animationInfo.id == sprite.animation) {
+				animationInfo.time += timeSinceLastDraw;
+			} else {
+				animationInfo.time = 0;
+				animationInfo.id = sprite.animation;
+			}
+			sprite.time = animationInfo.time;
+		} else {
+			player.animations.set(id, {
+				id: id,
+				time: 0
+			})
+			sprite.time = 0;
+		}
 		drawSpriteRelativeToPlayer(player, sprite);
 	}
 }
@@ -236,13 +276,14 @@ interface Sprite {
 	y: number,
 	angle: number,
 	id: string,
-	animation: string
+	animation: string,
+	time?: number
 }
 
 function drawSpriteRelativeToPlayer(player, sprite: Sprite) {
 	canvasContext.save();
-	canvasContext.translate(player.x - topleft.x, player.y - topleft.y);
-	canvasContext.rotate(player.angle + Math.PI / 2);
+	canvasContext.translate(player.creature.x - topleft.x, player.creature.y - topleft.y);
+	canvasContext.rotate(player.creature.angle + Math.PI / 2);
 	drawSprite(sprite);
 	canvasContext.restore();
 }
@@ -255,7 +296,9 @@ function drawSprite(sprite: Sprite) {
 		console.log(`Animation ${sprite.animation} not found for sprite ${sprite.id}`);
 		return;
 	}
-	const sourceFrame = animation.frames[0];
+	const currentFrame = Math.floor((sprite.time / animation.delay)) % animation.frames.length;
+
+	const sourceFrame = animation.frames[currentFrame];
 
 	canvasContext.translate(sprite.x, sprite.y);
 	canvasContext.rotate(sprite.angle);
@@ -274,6 +317,7 @@ const spriteTable = {
 			},
 			walking: {
 				delay: 100,
+				loops: true,
 				frames: [
 					{ x: 50, y: 0 },
 					{ x: 100, y: 0 },
@@ -302,7 +346,7 @@ const spriteTable = {
 		size: { x: 56, y: 66 },
 		animations: {
 			swinging: {
-				delay: 100,
+				delay: 60,
 				frames: [{ x: 0, y: 0 },
 				{ x: 56 * 1, y: 0 },
 				{ x: 56 * 2, y: 0 },

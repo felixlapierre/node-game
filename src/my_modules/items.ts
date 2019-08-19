@@ -94,23 +94,13 @@ export class Sword extends Weapon {
   createTextureFromState() {
     switch (this.state) {
       case "sheathed":
-        return undefined;
+        return new Sprite(0, 0, 0, 'Slash', 'nothing');
 
       case "swingback":
         return undefined; //Placeholder
 
       case "swinging":
         return new Sprite(0, -30, 0, 'Slash', 'swinging');
-        // return new PlayerLockedTexture("static/Slash.png",
-        //   new Rectangle(
-        //     new Point(Math.floor(this.timeInState / (lengthSwing / 5)) * 56, 0),
-        //     new Point(56, 66)
-        //   ),
-        //   new Rectangle(
-        //     new Point(-56 / 2, -66),
-        //     new Point(56, 66)
-        //   ),
-        //   0, true);
     }
   }
 }

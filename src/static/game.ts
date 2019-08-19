@@ -13,7 +13,6 @@ import { Input } from "./Input";
 const input = new Input();
 
 import { SpriteTable } from "./SpriteTable";
-const spriteTable = new SpriteTable();
 
 interface LocalCreatureInfo {
   creature: Creature;
@@ -228,7 +227,7 @@ function drawSpriteRelativeToPlayer(player, sprite: Sprite) {
 }
 
 function drawSprite(sprite: Sprite) {
-  const info = spriteTable[sprite.id];
+  const info = SpriteTable[sprite.id];
   const image = info.image;
   const animation = info.animations[sprite.animation];
   if (animation === undefined) {

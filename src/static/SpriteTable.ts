@@ -7,13 +7,7 @@ targetDummy.src = "static/TargetDummy.png";
 var slash = new Image();
 slash.src = "static/Slash.png";
 
-export class SpriteTable {
-    constructor() {
-        return spriteTable;
-    }
-}
-
-const spriteTable = {
+export const SpriteTable = {
   Player: {
     image: playerImage,
     size: { x: 50, y: 50 },

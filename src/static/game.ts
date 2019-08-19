@@ -7,23 +7,10 @@ var topleft = {
 
 var bag = {
 	contents: [],
-	selected: 0,
 }
 
-var playerState = {
-	up: false,
-	down: false,
-	left: false,
-	right: false,
-	angle: 0,
-	click: false,
-	selected: bag.selected
-}
-
-var mouse = {
-	x: 0,
-	y: 0
-}
+import {Input} from './Input';
+const input = new Input();
 
 interface LocalCreatureInfo {
 	creature: Creature,
@@ -45,81 +32,22 @@ interface AnimationInfo {
 const players = new Map<string, LocalCreatureInfo>();
 const enemies = new Map<string, LocalCreatureInfo>();
 
-//Keyboard event listeners
-document.addEventListener('keydown', function (event) {
-	switch (event.keyCode) {
-		case 65: //A
-			playerState.left = true;
-			break;
-		case 87: //W
-			playerState.up = true;
-			break;
-		case 68: //D
-			playerState.right = true;
-			break;
-		case 83: //S
-			playerState.down = true;
-			break;
-	}
-	if (event.keyCode >= 49 && event.keyCode <= 57) {
-		bag.selected = event.keyCode - 49;
-		console.log(bag.selected);
-	}
-});
-
-document.addEventListener('keyup', function (event) {
-	switch (event.keyCode) {
-		case 65: //A
-			playerState.left = false;
-			break;
-		case 87: //W
-			playerState.up = false;
-			break;
-		case 68: //D
-			playerState.right = false;
-			break;
-		case 83: //S
-			playerState.down = false;
-			break;
-	}
-});
-
-document.addEventListener('mousedown', function (event) {
-	playerState.click = true;
-});
-
-document.addEventListener('mouseup', function (event) {
-	playerState.click = false;
-});
-
-document.addEventListener('mousemove', function (event) {
-	mouse.x = event.clientX - canvas.offsetLeft;
-	mouse.y = event.clientY - canvas.offsetTop;
-}, false);
-
-document.addEventListener('wheel', function (event) {
-	bag.selected = (bag.selected + (event.deltaY / 100)) % 9;
-	if (bag.selected < 0) {
-		bag.selected += 9;
-	}
-	return;
-});
 
 var map = undefined;
 socket.emit('new player');
 
 setInterval(function () {
 	calculateAngle();
-	socket.emit('movement', playerState);
+	socket.emit('movement', input.getPlayerState());
 }, 1000 / 60);
 
 function calculateAngle() {
-	var deltaX = mouse.x - canvas.width / 2;
-	var deltaY = mouse.y - canvas.height / 2;
+	var deltaX = input.mouse.x - canvas.width / 2 - canvas.offsetLeft;
+	var deltaY = input.mouse.y - canvas.height / 2 - canvas.offsetTop;
 
-	playerState.angle = Math.atan(deltaY / deltaX);
+	input.angle = Math.atan(deltaY / deltaX);
 	if (deltaX < 0) {
-		playerState.angle += Math.PI;
+		input.angle += Math.PI;
 	}
 }
 
@@ -239,7 +167,7 @@ function drawBag(context, x, y, sprite) {
 	var width = sprite.width / 2;
 	var height = sprite.height;
 	for (var i = 0; i < 9; i++) {
-		var sourceX = (bag.selected == i) ? 50 : 0;
+		var sourceX = (input.selected == i) ? 50 : 0;
 		context.drawImage(sprite, sourceX, 0, width, height,
 			x + i * width, y, width, height);
 		if (bag.contents[i] != undefined) {

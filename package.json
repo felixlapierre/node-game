@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "mocha -r ts-node/register test/**/*.test.ts",
-    "start": "npm run compile && npm run run",
+    "start": "npm run build && npm run run",
     "run": "node ./build/server.js",
     "build": "npm run compile && npm run webpack && npm run copy",
     "compile": "tsc",

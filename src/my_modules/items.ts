@@ -1,6 +1,9 @@
+import { Rectangle, Point } from './Utils/Geometry';
+import { Sprite } from './Sprite';
+
 export abstract class Item {
   GUID: number
-  private static GUIDCounter: number
+  private static GUIDCounter: number = 0;
   constructor(public name: string, public quantity: number) {
     this.GUID = Item.GUIDCounter++;
   }
@@ -30,7 +33,7 @@ export abstract class Weapon extends Item {
 
   abstract updateState(selected, click, elapsedTime);
 
-  abstract createTextureFromState();
+  abstract createTextureFromState(): Sprite;
 }
 
 /*
@@ -91,34 +94,15 @@ export class Sword extends Weapon {
   createTextureFromState() {
     switch (this.state) {
       case "sheathed":
-        return undefined;
+        return new Sprite(0, 0, 0, 'Slash', 'nothing');
 
       case "swingback":
         return undefined; //Placeholder
 
       case "swinging":
-        return new PlayerLockedTexture("static/Slash.png",
-          {
-            x: Math.floor(this.timeInState / (lengthSwing / 5)) * 56,
-            y: 0,
-            w: 56,
-            h: 66
-          },
-          {
-            x: -56/2,
-            y:-66,
-            w:56,
-            h:66
-          },
-          0, true);
+        return new Sprite(0, -30, 0, 'Slash', 'swinging');
     }
   }
-}
-interface Rectangle {
-  x: number,
-  y: number,
-  w: number,
-  h: number
 }
 
 export class PlayerLockedTexture {

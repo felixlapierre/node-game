@@ -1,3 +1,5 @@
+import { Point } from "./Utils/Geometry";
+
 const TILE_SIZE = 50;
 const HALF_TILE = 25;
 
@@ -5,7 +7,7 @@ const HALF_TILE = 25;
  * Calculate the coordinates of player after collision with a single wall.
  */
 function wallCollide(playerX, playerY, obstacleX, obstacleY) {
-  var newLocation = {x: playerX, y: playerY};
+  var newLocation = new Point(playerX, playerY);
   var deltaX = playerX - obstacleX;
   var deltaY = playerY - obstacleY;
 
@@ -43,10 +45,7 @@ function wallCollide(playerX, playerY, obstacleX, obstacleY) {
  * @param playerY The Y coordinate of the player
  */
 export function wallCheck(wallMap, playerX, playerY){
-  var newLocation = {
-    x: playerX,
-    y: playerY
-  };
+  var newLocation = new Point(playerX, playerY);
 
   var playerTile = {
     x: Math.floor((playerX-HALF_TILE)/TILE_SIZE),
@@ -72,7 +71,7 @@ export function wallCheck(wallMap, playerX, playerY){
  * @param bounds The bounds of the level
  */
 export function boundsCheck(playerX, playerY, bounds){
-  var coordinates= {x: playerX, y: playerY};
+  var coordinates= new Point(playerX, playerY);
   // check horizontal
   if (playerX<HALF_TILE){
     coordinates.x=HALF_TILE;

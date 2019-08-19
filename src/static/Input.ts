@@ -1,31 +1,19 @@
 
 export class Input {
-    left: boolean;
-    right: boolean;
-    up: boolean;
-    down: boolean;
-    angle: number;
-    click: boolean;
-    selected: number;
+    left = false;
+    right = false;
+    up = false;
+    down = false;
+    angle = 0;
+    click = false;
+    selected = 0;
 
-    mouse: {
-        x: number;
-        y: number;
+    mouse = {
+        x: 0,
+        y: 0
     }
 
     constructor() {
-        this.left = false;
-        this.right = false;
-        this.up = false;
-        this.down = false;
-        this.angle = 0;
-        this.click = false;
-        this.mouse = {
-            x: 0,
-            y: 0
-        }
-        this.selected = 0;
-
         document.addEventListener('keydown', (event) => {
             switch (event.keyCode) {
                 case 65: //A

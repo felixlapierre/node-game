@@ -7,15 +7,15 @@ import { Point } from './Utils/Geometry';
 
 export class Area {
     private players: Map<string, Player>;
-    private enemies: Array<Enemy>;
+    private enemies: Map<string, Enemy>;
     public textureMap: TextureMap;
     private wallMap: WallMap;
     public loaded: boolean;
 
     constructor(public ID, onLoad) {
         this.players = new Map<string, Player>();
-        this.enemies = new Array<Enemy>();
-        this.enemies.push(new TargetDummy(new Point(50, 50)));
+        this.enemies = new Map<string, Enemy>();
+        this.addEnemy(new TargetDummy(new Point(50, 50)));
         Promise.all([
             TextureMap.load("./src/maps/" + ID + ".txt"),
             WallMap.load("./src/maps/" + ID + "_walls.txt")
@@ -40,6 +40,10 @@ export class Area {
         this.players.set(playerId, player);
     }
 
+    addEnemy(enemy: Enemy) {
+        this.enemies.set(enemy.ID, enemy);
+    }
+
     removePlayer(playerId: string) {
         this.players.delete(playerId);
     }
@@ -53,7 +57,7 @@ export class Area {
             return;
         const payload = {
             players: {},
-            enemies: []
+            enemies: {}
         };
 
         this.players.forEach((player, socketID, map) => {
@@ -78,9 +82,9 @@ export class Area {
             io.sockets.connected[socketID].emit('returnPlayerState', {x:newCenter.x, y:newCenter.y, bag:{contents:player.bag.contents}});
         })
 
-        this.enemies.forEach((enemy) => {
+        this.enemies.forEach((enemy, ID) => {
             enemy.Update(elapsedTime);
-            payload.enemies.push(enemy.getDisplayInfo());
+            payload.enemies[ID] = enemy.getDisplayInfo();
         })
 
         io.to(this.ID).emit('areaState', payload);

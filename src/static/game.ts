@@ -1,4 +1,3 @@
-//const io = require('socket.io-client');
 var socket = io();
 const tileSize = 50;
 var topleft = {
@@ -25,6 +24,16 @@ var mouse = {
 	x: 0,
 	y: 0
 }
+
+interface Creature {
+	x: number,
+	y: number,
+	angle: number,
+	sprites: any
+}
+
+const players = new Map<string, Creature>();
+const enemies = new Map<string, Creature>();
 
 //Keyboard event listeners
 document.addEventListener('keydown', function (event) {
@@ -133,21 +142,31 @@ targetDummy.src = "static/TargetDummy.png";
 var slash = new Image();
 slash.src = "static/Slash.png";
 
-var textures = {};
-
-function getTexture(source) {
-	var returned = textures[source];
-	if (returned != undefined) {
-		return returned;
-	} else {
-		var newTexture = new Image();
-		newTexture.src = source;
-		textures[source] = newTexture;
-		return newTexture;
-	}
-}
-
 socket.on('areaState', function (state) {
+	for (var id in state.players) {
+		players.set(id, state.players[id]);
+	}
+
+	for (var id in state.enemies) {
+		enemies.set(id, state.enemies[id]);
+	}
+
+	if(myPlayerId && players.has(myPlayerId)) {
+		topleft.x = players.get(myPlayerId).x - canvas.width / 2;
+		topleft.y = players.get(myPlayerId).y - canvas.height / 2;
+	}
+});
+
+setInterval(Draw, 1000 / 60);
+
+let timeOfLastDraw = new Date().getTime();
+let timeSinceLastDraw = 0;
+
+function Draw() {
+	const now = new Date().getTime();
+	timeSinceLastDraw = now - timeOfLastDraw;
+	timeOfLastDraw = now;
+
 	canvasContext.clearRect(0, 0, 800, 600);
 	canvasContext.fillStyle = 'green';
 
@@ -163,11 +182,11 @@ socket.on('areaState', function (state) {
 		}
 	}
 
-	for (var id in state.players) {
-		drawPlayer(state.players[id]);
-	}
+	players.forEach((player) => {
+		drawPlayer(player);
+	})
 
-	state.enemies.forEach((enemy) => {
+	enemies.forEach((enemy) => {
 		drawPlayer(enemy);
 	})
 
@@ -175,16 +194,20 @@ socket.on('areaState', function (state) {
 	var left = canvas.clientWidth / 2 - (tileSize * 4.5);
 	var top = canvas.clientHeight - tileSize;
 	drawBag(canvasContext, left, top, itemBar)
-});
+}
 
 socket.on('mapdata', function (data) {
 	map = data;
 	spritesheet.src = "static/" + data.spritesheet;
 });
 
+let myPlayerId; 
+
+socket.on('identity', function(id) {
+	myPlayerId = id;
+})
+
 socket.on('returnPlayerState', function (data) {
-	topleft.x = data.x - canvas.width / 2;
-	topleft.y = data.y - canvas.height / 2;
 	bag.contents = data.bag.contents;
 });
 
@@ -202,8 +225,8 @@ function drawBag(context, x, y, sprite) {
 }
 
 function drawPlayer(player) {
-	for (var jd in player.sprites) {
-		var sprite = player.sprites[jd];
+	for (var id in player.sprites) {
+		var sprite = player.sprites[id];
 		drawSpriteRelativeToPlayer(player, sprite);
 	}
 }

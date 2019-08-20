@@ -1,8 +1,4 @@
 const tileSize = 50;
-var topleft = {
-  x: 0,
-  y: 0
-};
 
 var bag = {
   contents: []
@@ -12,90 +8,12 @@ import { Input } from "./Input";
 const input = new Input();
 
 import { SpriteTable } from "./SpriteTable";
+import {ClientStorage} from './ClientStorage';
+const clientStorage = new ClientStorage();
 
-interface LocalCreatureInfo {
-  creature: Creature;
-  animations: Map<string, AnimationInfo>;
-}
-
-interface Creature {
-  x: number;
-  y: number;
-  angle: number;
-  sprites: any;
-}
-
-interface AnimationInfo {
-  id: string;
-  time: number;
-}
-
-const players = new Map<string, LocalCreatureInfo>();
-const enemies = new Map<string, LocalCreatureInfo>();
-
-var map = undefined;
-let myPlayerId;
-
-var socket = io();
-
-socket.emit("new player");
-
-socket.on("mapdata", function(data) {
-  map = data;
-  spritesheet.src = "static/" + data.spritesheet;
-});
-
-socket.on("identity", function(id) {
-  myPlayerId = id;
-});
-
-socket.on("returnPlayerState", function(data) {
-  bag.contents = data.bag.contents;
-});
-
-socket.on("areaState", function(state) {
-  for (var id in state.players) {
-    if (players.has(id)) {
-      players.get(id).creature = state.players[id];
-    } else {
-      players.set(id, {
-        creature: state.players[id],
-        animations: new Map<string, AnimationInfo>()
-      });
-    }
-  }
-
-  for (var id in state.enemies) {
-    if (enemies.has(id)) {
-      enemies.get(id).creature = state.enemies[id];
-    } else {
-      enemies.set(id, {
-        creature: state.enemies[id],
-        animations: new Map<string, AnimationInfo>()
-      });
-    }
-  }
-
-  if (myPlayerId && players.has(myPlayerId)) {
-    topleft.x = players.get(myPlayerId).creature.x - canvas.width / 2;
-    topleft.y = players.get(myPlayerId).creature.y - canvas.height / 2;
-  }
-});
-
-setInterval(function() {
-  calculateAngle();
-  socket.emit("movement", input.getPlayerState());
-}, 1000 / 60);
-
-function calculateAngle() {
-  var deltaX = input.mouse.x - canvas.width / 2 - canvas.offsetLeft;
-  var deltaY = input.mouse.y - canvas.height / 2 - canvas.offsetTop;
-
-  input.angle = Math.atan(deltaY / deltaX);
-  if (deltaX < 0) {
-    input.angle += Math.PI;
-  }
-}
+import {Socket} from './Socket';
+const socket = new Socket(input, clientStorage);
+socket.setupSockets();
 
 interface Html5Canvas extends HTMLElement {
   width: number;
@@ -104,12 +22,10 @@ interface Html5Canvas extends HTMLElement {
 }
 
 var canvas = document.getElementById("canvas") as Html5Canvas;
-
+clientStorage.canvas = canvas;
 canvas.width = 800;
 canvas.height = 600;
 var canvasContext = canvas.getContext("2d");
-
-var spritesheet = new Image();
 
 var itemBar = new Image();
 itemBar.src = "static/ItemBar.png";
@@ -127,19 +43,19 @@ function Draw() {
   canvasContext.clearRect(0, 0, 800, 600);
   canvasContext.fillStyle = "green";
 
-  if (map != undefined && spritesheet.src != undefined) {
-    for (var i = 0; i < map.tiles.length; i++) {
-      var tile = map.tiles[i];
+  if (clientStorage.map != undefined && clientStorage.spritesheet.src != undefined) {
+    for (var i = 0; i < clientStorage.map.tiles.length; i++) {
+      var tile = clientStorage.map.tiles[i];
       for (var x = tile.destX0; x <= tile.destX1; x += tileSize) {
         for (var y = tile.destY0; y <= tile.destY1; y += tileSize) {
           canvasContext.drawImage(
-            spritesheet,
+            clientStorage.spritesheet,
             tile.sourceX,
             tile.sourceY,
             50,
             50,
-            x - topleft.x,
-            y - topleft.y,
+            x - clientStorage.topleft.x,
+            y - clientStorage.topleft.y,
             50,
             50
           );
@@ -148,12 +64,8 @@ function Draw() {
     }
   }
 
-  players.forEach(player => {
-    drawPlayer(player);
-  });
-
-  enemies.forEach(enemy => {
-    drawPlayer(enemy);
+  clientStorage.creatures.forEach(player => {
+    drawCreature(player);
   });
 
   //Determine the location at which the bag will be drawn
@@ -184,7 +96,7 @@ function drawBag(context, x, y, sprite) {
   }
 }
 
-function drawPlayer(player) {
+function drawCreature(player) {
   for (var id in player.creature.sprites) {
     const sprite = player.creature.sprites[id];
     if (player.animations.has(id)) {
@@ -219,8 +131,8 @@ interface Sprite {
 function drawSpriteRelativeToPlayer(player, sprite: Sprite) {
   canvasContext.save();
   canvasContext.translate(
-    player.creature.x - topleft.x,
-    player.creature.y - topleft.y
+    player.creature.x - clientStorage.topleft.x,
+    player.creature.y - clientStorage.topleft.y
   );
   canvasContext.rotate(player.creature.angle + Math.PI / 2);
   drawSprite(sprite);

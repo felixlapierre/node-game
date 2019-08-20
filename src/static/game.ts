@@ -1,4 +1,3 @@
-var socket = io();
 const tileSize = 50;
 var topleft = {
   x: 0,
@@ -35,7 +34,53 @@ const players = new Map<string, LocalCreatureInfo>();
 const enemies = new Map<string, LocalCreatureInfo>();
 
 var map = undefined;
+let myPlayerId;
+
+var socket = io();
+
 socket.emit("new player");
+
+socket.on("mapdata", function(data) {
+  map = data;
+  spritesheet.src = "static/" + data.spritesheet;
+});
+
+socket.on("identity", function(id) {
+  myPlayerId = id;
+});
+
+socket.on("returnPlayerState", function(data) {
+  bag.contents = data.bag.contents;
+});
+
+socket.on("areaState", function(state) {
+  for (var id in state.players) {
+    if (players.has(id)) {
+      players.get(id).creature = state.players[id];
+    } else {
+      players.set(id, {
+        creature: state.players[id],
+        animations: new Map<string, AnimationInfo>()
+      });
+    }
+  }
+
+  for (var id in state.enemies) {
+    if (enemies.has(id)) {
+      enemies.get(id).creature = state.enemies[id];
+    } else {
+      enemies.set(id, {
+        creature: state.enemies[id],
+        animations: new Map<string, AnimationInfo>()
+      });
+    }
+  }
+
+  if (myPlayerId && players.has(myPlayerId)) {
+    topleft.x = players.get(myPlayerId).creature.x - canvas.width / 2;
+    topleft.y = players.get(myPlayerId).creature.y - canvas.height / 2;
+  }
+});
 
 setInterval(function() {
   calculateAngle();
@@ -68,35 +113,6 @@ var spritesheet = new Image();
 
 var itemBar = new Image();
 itemBar.src = "static/ItemBar.png";
-
-socket.on("areaState", function(state) {
-  for (var id in state.players) {
-    if (players.has(id)) {
-      players.get(id).creature = state.players[id];
-    } else {
-      players.set(id, {
-        creature: state.players[id],
-        animations: new Map<string, AnimationInfo>()
-      });
-    }
-  }
-
-  for (var id in state.enemies) {
-    if (enemies.has(id)) {
-      enemies.get(id).creature = state.enemies[id];
-    } else {
-      enemies.set(id, {
-        creature: state.enemies[id],
-        animations: new Map<string, AnimationInfo>()
-      });
-    }
-  }
-
-  if (myPlayerId && players.has(myPlayerId)) {
-    topleft.x = players.get(myPlayerId).creature.x - canvas.width / 2;
-    topleft.y = players.get(myPlayerId).creature.y - canvas.height / 2;
-  }
-});
 
 setInterval(Draw, 1000 / 60);
 
@@ -145,21 +161,6 @@ function Draw() {
   var top = canvas.clientHeight - tileSize;
   drawBag(canvasContext, left, top, itemBar);
 }
-
-socket.on("mapdata", function(data) {
-  map = data;
-  spritesheet.src = "static/" + data.spritesheet;
-});
-
-let myPlayerId;
-
-socket.on("identity", function(id) {
-  myPlayerId = id;
-});
-
-socket.on("returnPlayerState", function(data) {
-  bag.contents = data.bag.contents;
-});
 
 function drawBag(context, x, y, sprite) {
   var width = sprite.width / 2;

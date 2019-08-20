@@ -1,12 +1,9 @@
 import { SpriteTable } from "./SpriteTable";
 import { ClientStorage } from "./ClientStorage";
 import { Input } from "./Input";
-const tileSize = 50;
+const TILE_SIZE = 50;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
-
-let timeOfLastDraw = new Date().getTime();
-let timeSinceLastDraw = 0;
 
 const itemBar = new Image();
 itemBar.src = "static/ItemBar.png";
@@ -47,8 +44,15 @@ interface Sprite {
 }
 
 export class Drawing {
-  canvasContext: CanvasContext;
-  constructor(private input: Input, private clientStorage: ClientStorage, private canvas: Html5Canvas) {
+  private canvasContext: CanvasContext;
+  private timeOfLastDraw = new Date().getTime();
+  private timeSinceLastDraw = 0;
+
+  constructor(
+    private input: Input,
+    private clientStorage: ClientStorage,
+    private canvas: Html5Canvas
+  ) {
     this.canvas.width = CANVAS_WIDTH;
     this.canvas.height = CANVAS_HEIGHT;
     this.clientStorage.canvas = this.canvas;
@@ -60,54 +64,66 @@ export class Drawing {
   }
 
   Draw() {
-    const now = new Date().getTime();
-    timeSinceLastDraw = now - timeOfLastDraw;
-    timeOfLastDraw = now;
+    this.calculateElapsedTime();
+    this.clearCanvas();
 
-    this.canvasContext.clearRect(0, 0, 800, 600);
-    this.canvasContext.fillStyle = "green";
-
-    if (
-      this.clientStorage.map != undefined &&
-      this.clientStorage.spritesheet.src != undefined
-    ) {
-      for (var i = 0; i < this.clientStorage.map.tiles.length; i++) {
-        var tile = this.clientStorage.map.tiles[i];
-        for (var x = tile.destX0; x <= tile.destX1; x += tileSize) {
-          for (var y = tile.destY0; y <= tile.destY1; y += tileSize) {
-            this.canvasContext.drawImage(
-              this.clientStorage.spritesheet,
-              tile.sourceX,
-              tile.sourceY,
-              50,
-              50,
-              x - this.clientStorage.topleft.x,
-              y - this.clientStorage.topleft.y,
-              50,
-              50
-            );
-          }
-        }
-      }
-    }
+    this.drawMap();
 
     this.clientStorage.creatures.forEach(player => {
       this.drawCreature(player);
     });
 
-    //Determine the location at which the bag will be drawn
-    var left = this.canvas.clientWidth / 2 - tileSize * 4.5;
-    var top = this.canvas.clientHeight - tileSize;
-    this.drawBag(this.canvasContext, left, top, itemBar);
+    this.drawBag();
   }
 
-  drawBag(context, x, y, sprite) {
-    var width = sprite.width / 2;
-    var height = sprite.height;
+  calculateElapsedTime() {
+    const now = new Date().getTime();
+    this.timeSinceLastDraw = now - this.timeOfLastDraw;
+    this.timeOfLastDraw = now;
+  }
+
+  clearCanvas() {
+    this.canvasContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    this.canvasContext.fillStyle = "green";
+  }
+
+  drawMap() {
+    if (
+      this.clientStorage.map === undefined ||
+      this.clientStorage.spritesheet.src === undefined
+    ) {
+      return;
+    }
+
+    for (var i = 0; i < this.clientStorage.map.tiles.length; i++) {
+      var tile = this.clientStorage.map.tiles[i];
+      for (var x = tile.destX0; x <= tile.destX1; x += TILE_SIZE) {
+        for (var y = tile.destY0; y <= tile.destY1; y += TILE_SIZE) {
+          this.canvasContext.drawImage(
+            this.clientStorage.spritesheet,
+            tile.sourceX,
+            tile.sourceY,
+            TILE_SIZE,
+            TILE_SIZE,
+            x - this.clientStorage.topleft.x,
+            y - this.clientStorage.topleft.y,
+            TILE_SIZE,
+            TILE_SIZE
+          );
+        }
+      }
+    }
+  }
+
+  drawBag() {
+    var x = this.canvas.clientWidth / 2 - TILE_SIZE * 4.5;
+    var y = this.canvas.clientHeight - TILE_SIZE;
+    var width = itemBar.width / 2;
+    var height = itemBar.height;
     for (var i = 0; i < 9; i++) {
       var sourceX = this.input.selected == i ? 50 : 0;
-      context.drawImage(
-        sprite,
+      this.canvasContext.drawImage(
+        itemBar,
         sourceX,
         0,
         width,
@@ -129,7 +145,7 @@ export class Drawing {
       if (player.animations.has(id)) {
         const animationInfo = player.animations.get(id);
         if (animationInfo.id == sprite.animation) {
-          animationInfo.time += timeSinceLastDraw;
+          animationInfo.time += this.timeSinceLastDraw;
         } else {
           animationInfo.time = 0;
           animationInfo.id = sprite.animation;
@@ -169,9 +185,9 @@ export class Drawing {
     }
     const currentFrame =
       Math.floor(sprite.time / animation.delay) % animation.frames.length;
-  
+
     const sourceFrame = animation.frames[currentFrame];
-  
+
     this.canvasContext.translate(sprite.x, sprite.y);
     this.canvasContext.rotate(sprite.angle);
     this.canvasContext.drawImage(
@@ -186,5 +202,4 @@ export class Drawing {
       info.size.y
     );
   }
-  
 }

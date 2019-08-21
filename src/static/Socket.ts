@@ -3,7 +3,6 @@ import { ClientStorage, AnimationInfo } from "./ClientStorage";
 
 export class Socket {
     socket: SocketIOClient.Socket;
-    myPlayerId;
     constructor(private input: Input, private clientStorage: ClientStorage) {
         this.socket = io();
     }
@@ -28,7 +27,7 @@ export class Socket {
     }
 
     savePlayerId(id) {
-        this.myPlayerId = id;
+        this.clientStorage.playerId = id;
     }
 
     saveBag(data) {
@@ -37,30 +36,37 @@ export class Socket {
 
     saveState(state) {
         for (var id in state.players) {
-            if (this.clientStorage.creatures.has(id)) {
-                this.clientStorage.creatures.get(id).creature = state.players[id];
-            } else {
-                this.clientStorage.creatures.set(id, {
-                    creature: state.players[id],
-                    animations: new Map<string, AnimationInfo>()
-                });
-            }
+            this.addOrUpdateCreature(id, state.players[id]);
         }
 
         for (var id in state.enemies) {
-            if (this.clientStorage.creatures.has(id)) {
-                this.clientStorage.creatures.get(id).creature = state.enemies[id];
-            } else {
-                this.clientStorage.creatures.set(id, {
-                    creature: state.enemies[id],
-                    animations: new Map<string, AnimationInfo>()
-                });
-            }
+            this.addOrUpdateCreature(id, state.enemies[id]);
         }
 
-        if (this.myPlayerId && this.clientStorage.creatures.has(this.myPlayerId)) {
-            this.clientStorage.topleft.x = this.clientStorage.creatures.get(this.myPlayerId).creature.x - this.clientStorage.canvas.width / 2;
-            this.clientStorage.topleft.y = this.clientStorage.creatures.get(this.myPlayerId).creature.y - this.clientStorage.canvas.height / 2;
+        this.updateCamera();
+    }
+
+    addOrUpdateCreature(id, creature) {
+        const creatures = this.clientStorage.creatures;
+        if (creatures.has(id)) {
+            creatures.get(id).creature = creature;
+        } else {
+            creatures.set(id, {
+                creature: creature,
+                animations: new Map<string, AnimationInfo>()
+            });
+        }
+    }
+
+    updateCamera() {
+        const id = this.clientStorage.playerId;
+        const creatures = this.clientStorage.creatures;
+        const canvas = this.clientStorage.canvas;
+        const topleft = this.clientStorage.topleft;
+        
+        if (id && creatures.has(id)) {
+           topleft.x = creatures.get(id).creature.x - canvas.width / 2;
+           topleft.y = creatures.get(id).creature.y - canvas.height / 2;
         }
     }
 

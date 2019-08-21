@@ -27,4 +27,5 @@ export class ClientStorage {
         y: 0
     }
     canvas: any;
+    playerId: string;
 }

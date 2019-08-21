@@ -13,66 +13,65 @@ export class Input {
   };
 
   constructor() {
-    document.addEventListener("keydown", event => {
-      switch (event.keyCode) {
-        case 65: //A
-          this.left = true;
-          break;
-        case 87: //W
-          this.up = true;
-          break;
-        case 68: //D
-          this.right = true;
-          break;
-        case 83: //S
-          this.down = true;
-          break;
-      }
-      if (event.keyCode >= 49 && event.keyCode <= 57) {
-        this.selected = event.keyCode - 49;
-      }
-    });
+    document.addEventListener("keydown", this.onKeyDown.bind(this));
 
-    document.addEventListener("keyup", event => {
-      switch (event.keyCode) {
-        case 65: //A
-          this.left = false;
-          break;
-        case 87: //W
-          this.up = false;
-          break;
-        case 68: //D
-          this.right = false;
-          break;
-        case 83: //S
-          this.down = false;
-          break;
-      }
-    });
+    document.addEventListener("keyup", this.onKeyUp.bind(this));
 
-    document.addEventListener("mousedown", event => {
-      this.click = true;
-    });
+    document.addEventListener("mousedown", this.onMouseDown.bind(this));
 
-    document.addEventListener("mouseup", event => {
-      this.click = false;
-    });
+    document.addEventListener("mouseup", this.onMouseUp.bind(this));
 
-    document.addEventListener(
-      "mousemove",
-      event => {
-        this.mouse.x = event.clientX;
-        this.mouse.y = event.clientY;
-      },
-      false
-    );
+    document.addEventListener("mousemove", this.onMouseMove.bind(this), false);
 
-    document.addEventListener("wheel", event => {
-      this.selected = (this.selected + event.deltaY / 100) % 9;
-      if (this.selected < 0) {
-        this.selected += 9;
-      }
-    });
+    document.addEventListener("wheel", this.onWheel.bind(this));
+  }
+
+  onKeyDown(event) {
+    this.setDirection(event.keyCode, true);
+    if (event.keyCode >= 49 && event.keyCode <= 57) {
+      this.selected = event.keyCode - 49;
+    }
+  }
+
+  onKeyUp(event) {
+    this.setDirection(event.keyCode, false);
+  }
+
+  setDirection(keyCode, value) {
+    switch (keyCode) {
+      case 65: //A
+        this.left = value;
+        break;
+      case 87: //W
+        this.up = value;
+        break;
+      case 68: //D
+        this.right = value;
+        break;
+      case 83: //S
+        this.down = value;
+        break;
+    }
+  }
+
+  onMouseDown(event) {
+    this.click = true;
+  }
+
+  onMouseUp(event) {
+    this.click = false;
+  }
+
+  onMouseMove(event) {
+    this.mouse.x = event.clientX;
+    this.mouse.y = event.clientY;
+  }
+
+  onWheel(event) {
+    this.selected = (this.selected + event.deltaY / 100) % 9;
+    if (this.selected < 0) {
+      this.selected += 9;
+    }
   }
 
   getPlayerState() {

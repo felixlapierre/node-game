@@ -64,22 +64,22 @@ export class Area {
             player.update(elapsedTime);
             const deltaT = elapsedTime / 1000;
 
-            let newCenter = player.getCenter();
+            let center = player.getCenter();
 
-            if(player.intent.left) {newCenter.x -= 300 * deltaT;}
-            if(player.intent.up) {newCenter.y -= 300 * deltaT;}
-            if(player.intent.right) {newCenter.x += 300 * deltaT}
-            if(player.intent.down) {newCenter.y += 300 * deltaT;}
+            if(player.intent.left) {center.x -= 300 * deltaT;}
+            if(player.intent.up) {center.y -= 300 * deltaT;}
+            if(player.intent.right) {center.x += 300 * deltaT}
+            if(player.intent.down) {center.y += 300 * deltaT;}
     
             // collision checks
-            newCenter = boundsCheck(newCenter.x, newCenter.y, this.wallMap.bounds);
-            newCenter = wallCheck(this.wallMap.tiles, newCenter.x, newCenter.y);
+            center = boundsCheck(center.x, center.y, this.wallMap.bounds);
+            center = wallCheck(this.wallMap.tiles, center.x, center.y);
 
-            player.setCenter(newCenter);
+            player.setCenter(center);
 
             payload.players[socketID] = player.GetDisplayInfo();
 
-            io.sockets.connected[socketID].emit('returnPlayerState', {x:newCenter.x, y:newCenter.y, bag:{contents:player.bag.contents}});
+            io.sockets.connected[socketID].emit('returnPlayerState', {x:center.x, y:center.y, bag:{contents:player.bag.contents}});
         })
 
         this.enemies.forEach((enemy, ID) => {

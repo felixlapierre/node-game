@@ -1,66 +1,37 @@
+import { Point, Rectangle, Shape } from '../Utils/Geometry';
+import { Creature } from './Creature';
+import { Mover } from './Movers/Mover';
+import { FiniteHealth, Health } from './Health';
+import { Weapon, InventoryWeapon } from '../Items/Weapon';
 import { Bag } from '../inventory';
-import { Sword } from '../Items/items';
-import { Point } from '../Utils/Geometry';
-import { Sprite } from '../Sprite';
+import { PlayerInputBehaviour } from './Behaviours/Behaviour';
+import { WallMap } from '../map';
 
-export interface Intent {
-    left: boolean,
-    right: boolean,
-    up: boolean,
-    down: boolean,
-    click: boolean
-}
-export class Player {
-    private x: number;
-    private y: number;
-    angle: number;
-    intent: Intent;
-    textures: any;
-    bag: Bag;
+export class Player implements Creature {
+    public Hitbox: Shape
+    public Mover: Mover
+    public Health: Health
+    public Weapon: Weapon;
+    public Textures: any;
+    public Behaviour: PlayerInputBehaviour;
+    public Bag: Bag;
 
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.angle = 0;
-        this.intent = {
-            left: false,
-            right: false,
-            up: false,
-            down: false,
-            click: false
-        };
-        this.textures = {};
-        this.textures.self = new Sprite(0, 0, 0, 'Player', 'standing');
-        this.bag = new Bag();
-        this.bag.contents[0] = new Sword();
-    }
-
-    update(elapsedTime) {
-        for (var i in this.bag.contents) {
-            this.bag.contents[i].update(parseInt(i) == this.bag.selected, this.intent.click, elapsedTime, this.textures);
-        }
-        if(this.intent.left || this.intent.right || this.intent.up || this.intent.down) {
-            this.textures.self.animation = 'walking';
-        } else {
-            this.textures.self.animation = 'standing';
-        }
-    }
-
-    getCenter() {
-        return new Point(this.x, this.y);
-    }
-
-    setCenter(point: Point) {
-        this.x = point.x;
-        this.y = point.y;
+    constructor(x: number, y: number) {
+        this.Hitbox = new Rectangle(new Point(x, y), new Point(50, 50));
+        this.Mover = new Mover(this.Hitbox);
+        this.Health = new FiniteHealth(100);
+        this.Bag = new Bag();
+        this.Weapon = new InventoryWeapon(this.Bag);
+        this.Textures = {};
+        this.Behaviour = new PlayerInputBehaviour(this.Bag, this.Textures, this.Mover, this.Weapon);
     }
 
     GetDisplayInfo() {
         return {
-            x: this.x,
-            y: this.y,
-            angle: this.angle,
-            sprites: this.textures
+            x: this.Hitbox.GetCenter().x,
+            y: this.Hitbox.GetCenter().y,
+            angle: this.Behaviour.intent.angle,
+            sprites: this.Textures
         }
     }
 }

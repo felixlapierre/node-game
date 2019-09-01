@@ -1,6 +1,5 @@
 import { Player } from './Creatures/Player';
 import { TextureMap, WallMap } from './map';
-import { wallCheck, boundsCheck } from './collision';
 import { Enemy } from './Creatures/Enemy';
 import { TargetDummy } from './Creatures/TargetDummy';
 import { Point } from './Utils/Geometry';
@@ -33,6 +32,7 @@ export class Area {
     }
 
     newPlayer(playerId: string) {
+        // TODO: Inject special case EmptyWallMap.
         this.players.set(playerId, new Player(300, 300));
     }
 
@@ -61,25 +61,13 @@ export class Area {
         };
 
         this.players.forEach((player, socketID, map) => {
-            player.update(elapsedTime);
-            const deltaT = elapsedTime / 1000;
-
-            let center = player.getCenter();
-
-            if(player.intent.left) {center.x -= 300 * deltaT;}
-            if(player.intent.up) {center.y -= 300 * deltaT;}
-            if(player.intent.right) {center.x += 300 * deltaT}
-            if(player.intent.down) {center.y += 300 * deltaT;}
-    
-            // collision checks
-            center = boundsCheck(center.x, center.y, this.wallMap.bounds);
-            center = wallCheck(this.wallMap.tiles, center.x, center.y);
-
-            player.setCenter(center);
+            player.Behaviour.Update(elapsedTime / 1000, this.wallMap);
 
             payload.players[socketID] = player.GetDisplayInfo();
 
-            io.sockets.connected[socketID].emit('returnPlayerState', {x:center.x, y:center.y, bag:{contents:player.bag.contents}});
+            const playerCenter = player.Hitbox.GetCenter();
+            
+            io.sockets.connected[socketID].emit('returnPlayerState', {x:playerCenter.x, y:playerCenter.y, bag:{contents:player.Bag.contents}});
         })
 
         this.enemies.forEach((enemy, ID) => {
@@ -92,12 +80,6 @@ export class Area {
 
     setPlayerIntent(playerID: string, data: any) {
         const player = this.players.get(playerID);
-		player.intent.left = data.left;
-		player.intent.right = data.right;
-		player.intent.up = data.up;
-		player.intent.down = data.down;
-		player.intent.click = data.click;
-		player.angle = data.angle;
-        player.bag.selected = data.selected;
+		player.Behaviour.SetIntent(data);
     }
 }

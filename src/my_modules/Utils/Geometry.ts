@@ -168,4 +168,17 @@ export class Vector {
         this.x *= amount;
         this.y *= amount;
     }
+
+    GetLength() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+
+    Normalize() {
+        const length = this.GetLength();
+        if(length === 0) {
+            throw new Error("Attempted to normalize the null vector");
+        }
+        this.x /= length;
+        this.y /= length;
+    }
 }

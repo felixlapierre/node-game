@@ -5,8 +5,6 @@ import { Sprite } from '../Sprite';
 const size = new Point(50, 50);
 
 export class TargetDummy extends Enemy {
-    private health: number
-
     x: number;
     y: number;
     angle: number;
@@ -19,7 +17,6 @@ export class TargetDummy extends Enemy {
         this.angle = 0;
         this.textures = {};
         this.textures.self = new Sprite(0, 0, 0, "TargetDummy", "standing");
-        this.health = 100;
     }
 
     Update(elapsedTime: number) {

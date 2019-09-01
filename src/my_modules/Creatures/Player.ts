@@ -4,7 +4,7 @@ import { Mover } from './Movers/Mover';
 import { FiniteHealth, Health } from './Health';
 import { Weapon, InventoryWeapon } from '../Items/Weapon';
 import { Bag } from '../inventory';
-import { PlayerInputBehaviour } from './Behaviours/Behaviour';
+import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
 
 export class Player implements Creature {
     public Hitbox: Shape

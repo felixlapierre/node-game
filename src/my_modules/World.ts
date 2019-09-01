@@ -36,7 +36,10 @@ export function getAreaOfSocketID(socketID) {
 }
 
 export function removePlayer(socketID) {
-  areas.get(socket_rooms[socketID]).removePlayer(socketID);
+  const area = areas.get(socket_rooms[socketID]);
+  if(area) {
+    area.removePlayer(socketID);
+  }
   delete socket_rooms[socketID];
 }
 

@@ -75,9 +75,13 @@ var lastUpdateTime = (new Date()).getTime();
 setInterval(function () {
 	//Calculate how much time has elapsed
 	var currentTime = (new Date()).getTime();
-	var deltaT = (currentTime - lastUpdateTime) / 1000.0;
-	var timeElapsedMilliseconds = deltaT * 1000;
+	var timeElapsedMilliseconds = (currentTime - lastUpdateTime);
 	lastUpdateTime = currentTime;
+
+	//Limit elapsed milliseconds 
+	if(timeElapsedMilliseconds > 10) {
+		timeElapsedMilliseconds = 10;
+	}
 
 	//Update every player in every area
 	World.updateAllAreas(timeElapsedMilliseconds, io);

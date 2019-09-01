@@ -43,9 +43,9 @@ export function removePlayer(socketID) {
   delete socket_rooms[socketID];
 }
 
-export function updateAllAreas(elapsedTime: number, io: SocketIO.Server) {
+export function updateAllAreas(elapsedTimeMilliseconds: number, io: SocketIO.Server) {
   areas.forEach((area, ID, map) => {
-    area.update(elapsedTime, io);
+    area.update(elapsedTimeMilliseconds, io);
   })
 }
 

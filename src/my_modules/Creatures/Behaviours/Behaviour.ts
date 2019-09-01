@@ -7,7 +7,7 @@ import { Vector } from "../../Utils/Geometry";
 import { WallMap } from "../../map";
 
 //NOTE: Not sure if this was designed for s or ms
-const stepAcceleration = 8000;
+const pixelsTraveledPerSecond = 5;
 
 export interface Behaviour {
     Update(elapsedSeconds: number, wallMap: WallMap): void
@@ -39,7 +39,8 @@ export class PlayerInputBehaviour implements Behaviour {
         this.bag.contents[0] = new Sword();
     }
 
-    Update(elapsedSeconds: number, wallMap: WallMap) {
+    Update(elapsedMilliseconds: number, wallMap: WallMap) {
+        const elapsedSeconds = elapsedMilliseconds / 1000;
         const intentDirection = new Vector(0, 0);
 
         if (this.intent.left) { intentDirection.x -= 1 }
@@ -49,14 +50,14 @@ export class PlayerInputBehaviour implements Behaviour {
 
         if(intentDirection.GetLength() != 0) {
             intentDirection.Normalize();
-            intentDirection.Multiply(stepAcceleration * elapsedSeconds)
+            intentDirection.Multiply(pixelsTraveledPerSecond * elapsedSeconds)
             this.Mover.AddVelocity(intentDirection);
         }
 
         this.Mover.Update(elapsedSeconds, wallMap);
 
         for (var i in this.bag.contents) {
-            this.bag.contents[i].update(parseInt(i) == this.bag.selected, this.intent.click, elapsedSeconds * 1000, this.Textures);
+            this.bag.contents[i].update(parseInt(i) == this.bag.selected, this.intent.click, elapsedMilliseconds * 1000, this.Textures);
         }
         if (this.intent.left || this.intent.right || this.intent.up || this.intent.down) {
             this.Textures.self.animation = 'walking';

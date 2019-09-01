@@ -52,7 +52,7 @@ export class Area {
         return this.players.size;
     }
 
-    update(elapsedTime: number, io: SocketIO.Server) {
+    update(elapsedTimeMilliseconds: number, io: SocketIO.Server) {
         if(!this.loaded)
             return;
         const payload = {
@@ -61,7 +61,7 @@ export class Area {
         };
 
         this.players.forEach((player, socketID, map) => {
-            player.Behaviour.Update(elapsedTime / 1000, this.wallMap);
+            player.Behaviour.Update(elapsedTimeMilliseconds / 1000, this.wallMap);
 
             payload.players[socketID] = player.GetDisplayInfo();
 
@@ -71,7 +71,7 @@ export class Area {
         })
 
         this.enemies.forEach((enemy, ID) => {
-            enemy.Update(elapsedTime);
+            enemy.Update(elapsedTimeMilliseconds);
             payload.enemies[ID] = enemy.getDisplayInfo();
         })
 

@@ -5,7 +5,6 @@ import { FiniteHealth, Health } from './Health';
 import { Weapon, InventoryWeapon } from '../Items/Weapon';
 import { Bag } from '../inventory';
 import { PlayerInputBehaviour } from './Behaviours/Behaviour';
-import { WallMap } from '../map';
 
 export class Player implements Creature {
     public Hitbox: Shape

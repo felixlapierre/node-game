@@ -7,7 +7,7 @@ import { Vector } from "../../Utils/Geometry";
 import { WallMap } from "../../map";
 
 //NOTE: Not sure if this was designed for s or ms
-const pixelsTraveledPerSecond = 5;
+const pixelsTraveledPerSecond = 500;
 
 export interface Behaviour {
     Update(elapsedSeconds: number, wallMap: WallMap): void
@@ -40,7 +40,7 @@ export class PlayerInputBehaviour implements Behaviour {
     }
 
     Update(elapsedMilliseconds: number, wallMap: WallMap) {
-        const elapsedSeconds = elapsedMilliseconds / 1000;
+        const elapsedSeconds = elapsedMilliseconds;
         const intentDirection = new Vector(0, 0);
 
         if (this.intent.left) { intentDirection.x -= 1 }
@@ -50,9 +50,9 @@ export class PlayerInputBehaviour implements Behaviour {
 
         if(intentDirection.GetLength() != 0) {
             intentDirection.Normalize();
-            intentDirection.Multiply(pixelsTraveledPerSecond * elapsedSeconds)
-            this.Mover.AddVelocity(intentDirection);
+            intentDirection.Multiply(pixelsTraveledPerSecond)
         }
+        this.Mover.SetVelocity(intentDirection);
 
         this.Mover.Update(elapsedSeconds, wallMap);
 

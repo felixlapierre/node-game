@@ -1,8 +1,8 @@
-import { Player } from './player';
+import { Player } from './Creatures/Player';
 import { TextureMap, WallMap } from './map';
 import { wallCheck, boundsCheck } from './collision';
-import { Enemy } from './Enemies/Enemy';
-import { TargetDummy } from './Enemies/TargetDummy';
+import { Enemy } from './Creatures/Enemy';
+import { TargetDummy } from './Creatures/TargetDummy';
 import { Point } from './Utils/Geometry';
 
 export class Area {

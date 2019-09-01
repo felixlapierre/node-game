@@ -1,7 +1,7 @@
-import { Bag } from './inventory';
-import { Sword } from './Items/items';
-import { Point } from './Utils/Geometry';
-import { Sprite } from './Sprite';
+import { Bag } from '../inventory';
+import { Sword } from '../Items/items';
+import { Point } from '../Utils/Geometry';
+import { Sprite } from '../Sprite';
 
 export interface Intent {
     left: boolean,

@@ -1,5 +1,5 @@
 import { Enemy } from './Enemy';
-import { Rectangle, Point } from './../Utils/Geometry';
+import { Rectangle, Point } from '../Utils/Geometry';
 import { Sprite } from '../Sprite';
 
 const size = new Point(50, 50);

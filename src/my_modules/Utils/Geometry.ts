@@ -150,3 +150,22 @@ function CircleRectangleOverlap(circle: Circle, rectangle: Rectangle) {
 
     return PointCircleOverlap(closest, circle);
 }
+
+export class Vector {
+    constructor(public x: number, public y: number) { }
+
+    Add(vector: Vector) {
+        this.x += vector.x;
+        this.y += vector.y;
+    }
+
+    Subtract(vector: Vector) {
+        this.x -= vector.x;
+        this.y -= vector.y;
+    }
+
+    Multiply(amount: number) {
+        this.x *= amount;
+        this.y *= amount;
+    }
+}

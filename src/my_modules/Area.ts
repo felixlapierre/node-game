@@ -3,6 +3,7 @@ import { TextureMap, WallMap } from './map';
 import { Enemy } from './Creatures/Enemy';
 import { TargetDummy } from './Creatures/TargetDummy';
 import { Point } from './Utils/Geometry';
+import { Goblin } from './Creatures/Goblin';
 
 export class Area {
     private players: Map<string, Player>;
@@ -15,6 +16,7 @@ export class Area {
         this.players = new Map<string, Player>();
         this.enemies = new Map<string, Enemy>();
         this.addEnemy(new TargetDummy(new Point(50, 50)));
+        this.addEnemy(new Goblin(new Point(500, 500), this.players));
         Promise.all([
             TextureMap.load("./src/maps/" + ID + ".txt"),
             WallMap.load("./src/maps/" + ID + "_walls.txt")
@@ -61,7 +63,7 @@ export class Area {
         };
 
         this.players.forEach((player, socketID, map) => {
-            player.Behaviour.Update(elapsedTimeMilliseconds / 1000, this.wallMap);
+            player.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
 
             payload.players[socketID] = player.GetDisplayInfo();
 

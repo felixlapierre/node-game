@@ -36,7 +36,7 @@ export class PlayerInputBehaviour implements Behaviour {
     }
 
     Update(elapsedMilliseconds: number, wallMap: WallMap) {
-        const elapsedSeconds = elapsedMilliseconds;
+        const elapsedSeconds = elapsedMilliseconds / 1000;
         const intentDirection = new Vector(0, 0);
 
         if (this.intent.left) { intentDirection.x -= 1 }
@@ -53,7 +53,7 @@ export class PlayerInputBehaviour implements Behaviour {
         this.Mover.Update(elapsedSeconds, wallMap);
 
         for (var i in this.bag.contents) {
-            this.bag.contents[i].update(parseInt(i) == this.bag.selected, this.intent.click, elapsedMilliseconds * 1000, this.Textures);
+            this.bag.contents[i].update(parseInt(i) == this.bag.selected, this.intent.click, elapsedMilliseconds, this.Textures);
         }
         if (this.intent.left || this.intent.right || this.intent.up || this.intent.down) {
             this.Textures.self.animation = 'walking';

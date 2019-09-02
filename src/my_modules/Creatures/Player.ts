@@ -1,7 +1,7 @@
 import { Point, Rectangle, Shape } from '../Utils/Geometry';
 import { Creature } from './Creature';
 import { BasicMover } from './Movers/Mover';
-import { FiniteHealth, Health } from './Health';
+import { FiniteHealth } from './Health';
 import { Weapon, InventoryWeapon } from '../Items/Weapon';
 import { Bag } from '../inventory';
 import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
@@ -9,7 +9,7 @@ import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
 export class Player implements Creature {
     public Hitbox: Shape
     public Mover: BasicMover
-    public Health: Health
+    public Health: FiniteHealth
     public Weapon: Weapon;
     public Textures: any;
     public Behaviour: PlayerInputBehaviour;

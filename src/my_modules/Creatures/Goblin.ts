@@ -6,6 +6,7 @@ import { Weapon } from "../Items/Weapon";
 import { StraightRunBehaviour } from "./Behaviours/StraightRunBehaviour";
 import { Player } from "./Player";
 import { Id } from "../Id";
+import { LooperBehaviour } from "./Behaviours/LooperBehaviour";
 
 export class Goblin implements Enemy {
     ID: string;
@@ -21,7 +22,7 @@ export class Goblin implements Enemy {
     Hitbox: Rectangle;
     Health: FiniteHealth;
     Weapon: Weapon;
-    Behaviour: StraightRunBehaviour;
+    Behaviour: LooperBehaviour;
     Textures: any;
 
     constructor(location: Point, players: Map<string, Player>) {
@@ -29,7 +30,7 @@ export class Goblin implements Enemy {
         this.Mover = new BasicMover(this.Hitbox);
         this.Health = new FiniteHealth(100);
         this.Textures = {};
-        this.Behaviour = new StraightRunBehaviour(players, this.Hitbox, this.Mover, this.Textures);
+        this.Behaviour = new LooperBehaviour(players, this.Hitbox, this.Mover, this.Textures);
         this.ID = Id.get();
     }
 }

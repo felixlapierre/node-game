@@ -1,12 +1,12 @@
 import { Behaviour } from "./Behaviour";
-import { Player } from "../Player";
-import { Shape, Distance, Vector } from "../../Utils/Geometry";
-import { Mover } from "../Movers/Mover";
 import { Sprite } from "../../Sprite";
+import { Player } from "../Player";
+import { Mover } from "../Movers/Mover";
+import { Shape, Distance, Vector } from "../../Utils/Geometry";
 
 const pixelsTraveledPerSecond = 350;
 
-export class StraightRunBehaviour implements Behaviour {
+export class LooperBehaviour implements Behaviour {
     private angle: number = 0;
 
     constructor(private players: Map<string, Player>, private hitbox: Shape, private mover: Mover, private Textures: any) {
@@ -28,7 +28,7 @@ export class StraightRunBehaviour implements Behaviour {
         });
 
         let direction = new Vector(0, 0);
-        if (closest && closestDistance > 50) {
+        if (closest) {
             // Get vector towards closest player.
             const deltaX = closest.Hitbox.GetCenter().x - this.hitbox.GetCenter().x;
             const deltaY = closest.Hitbox.GetCenter().y - this.hitbox.GetCenter().y;
@@ -39,6 +39,14 @@ export class StraightRunBehaviour implements Behaviour {
                 direction.Normalize();
                 direction.Multiply(pixelsTraveledPerSecond);
                 this.angle = Math.atan2(direction.x, direction.y);
+            }
+
+            //Loop if close
+            if(closestDistance < 50) {
+                // Rotate direction by 90 degrees
+                const temp = direction.x;
+                direction.x = direction.y;
+                direction.y = temp * -1;
             }
         }
 

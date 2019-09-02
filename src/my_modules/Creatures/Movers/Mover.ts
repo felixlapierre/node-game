@@ -2,7 +2,12 @@ import { Shape, Vector } from "../../Utils/Geometry";
 import { boundsCheck, wallCheck } from "../../collision";
 import { WallMap } from "../../map";
 
-export class Mover {
+export interface Mover {
+    Update(elapsedSeconds: number, wallMap: WallMap): void;
+    SetVelocity(amount: Vector): void;
+}
+
+export class BasicMover implements Mover {
     private velocity: Vector = new Vector(0, 0);
 
     constructor(private position: Shape) {
@@ -24,7 +29,6 @@ export class Mover {
         center = wallCheck(wallMap.tiles, center.x, center.y);
 
         this.position.SetCenter(center);
-        console.log(`${center.x} ${center.y}`)
     }
 
     SetVelocity(amount: Vector) {

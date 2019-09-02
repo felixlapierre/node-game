@@ -1,18 +1,6 @@
-import { Shape } from "../Utils/Geometry";
+import { Creature } from "./Creature";
 
-export abstract class Enemy {
-    public ID: string
-    private static nextID = 0;
-
-    constructor(protected hitbox: Shape) { 
-        this.ID = `${Enemy.nextID++}`;
-    }
-
-    public IsHitBy(shape: Shape) {
-        return this.hitbox.Overlaps(shape);
-    }
-
-    abstract Update(elapsedTime: number);
-
-    abstract getDisplayInfo(): any
+export interface Enemy extends Creature {
+    ID: string
+    getDisplayInfo(): any;
 }

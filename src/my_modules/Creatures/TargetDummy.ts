@@ -1,34 +1,44 @@
 import { Enemy } from './Enemy';
-import { Rectangle, Point } from '../Utils/Geometry';
+import { Rectangle, Point, Shape } from '../Utils/Geometry';
 import { Sprite } from '../Sprite';
+import { Mover } from './Movers/Mover';
+import { NoopMover } from './Movers/NoopMover';
+import { InfiniteHealth } from './Health';
+import { NoopBehaviour } from './Behaviours/NoopBehaviour';
+import { NoopWeapon } from '../Items/NoopWeapon';
+import { Id } from '../Id';
 
 const size = new Point(50, 50);
 
-export class TargetDummy extends Enemy {
-    x: number;
-    y: number;
-    angle: number;
-    textures: any;
+export class TargetDummy implements Enemy {
+    public Hitbox: Shape
+    public Mover: Mover
+    public Health: InfiniteHealth
+    public Weapon: NoopWeapon;
+    public Textures: any;
+    public Behaviour: NoopBehaviour;
+
+    public ID: string;
 
     constructor(location: Point) {
-        super(new Rectangle(location, size))
-        this.x = location.x;
-        this.y = location.y;
-        this.angle = 0;
-        this.textures = {};
-        this.textures.self = new Sprite(0, 0, 0, "TargetDummy", "standing");
-    }
+        this.Hitbox = new Rectangle(new Point(0, 0), new Point(50, 50));
+        this.Hitbox.SetCenter(location);
+        this.Mover = new NoopMover();
+        this.Health = new InfiniteHealth();
+        this.Weapon = new NoopWeapon();
+        this.Textures = {};
+        this.Textures.self = new Sprite(0, 0, 0, "TargetDummy", "standing");
+        this.Behaviour = new NoopBehaviour();
 
-    Update(elapsedTime: number) {
-        // The target dummy doesn't do a lot.
+        this.ID = Id.get();
     }
 
     getDisplayInfo() {
         return {
-            x: this.x,
-            y: this.y,
-            angle: this.angle,
-            sprites: this.textures
+            x: this.Hitbox.GetCenter().x,
+            y: this.Hitbox.GetCenter().y,
+            angle: this.Behaviour.GetAngle(),
+            sprites: this.Textures
         }
     }
 }

@@ -71,7 +71,7 @@ export class Area {
         })
 
         this.enemies.forEach((enemy, ID) => {
-            enemy.Update(elapsedTimeMilliseconds);
+            enemy.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
             payload.enemies[ID] = enemy.getDisplayInfo();
         })
 

@@ -66,4 +66,6 @@ export class PlayerInputBehaviour implements Behaviour {
         this.intent = intent;
         this.bag.selected = intent.selected;
     }
+
+    GetAngle() { return this.intent.angle }
 }

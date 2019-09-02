@@ -1,6 +1,6 @@
 import { Point, Rectangle, Shape } from '../Utils/Geometry';
 import { Creature } from './Creature';
-import { Mover } from './Movers/Mover';
+import { BasicMover } from './Movers/Mover';
 import { FiniteHealth, Health } from './Health';
 import { Weapon, InventoryWeapon } from '../Items/Weapon';
 import { Bag } from '../inventory';
@@ -8,7 +8,7 @@ import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
 
 export class Player implements Creature {
     public Hitbox: Shape
-    public Mover: Mover
+    public Mover: BasicMover
     public Health: Health
     public Weapon: Weapon;
     public Textures: any;
@@ -17,7 +17,7 @@ export class Player implements Creature {
 
     constructor(x: number, y: number) {
         this.Hitbox = new Rectangle(new Point(x, y), new Point(50, 50));
-        this.Mover = new Mover(this.Hitbox);
+        this.Mover = new BasicMover(this.Hitbox);
         this.Health = new FiniteHealth(100);
         this.Bag = new Bag();
         this.Weapon = new InventoryWeapon(this.Bag);

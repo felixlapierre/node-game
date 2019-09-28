@@ -7,17 +7,10 @@ import { StraightRunBehaviour } from "./Behaviours/StraightRunBehaviour";
 import { Player } from "./Player";
 import { Id } from "../Id";
 import { LooperBehaviour } from "./Behaviours/LooperBehaviour";
+import { NoopWeapon } from "../Items/NoopWeapon";
 
 export class Goblin implements Enemy {
     ID: string;
-    getDisplayInfo() {
-        return {
-            x: this.Hitbox.GetCenter().x,
-            y: this.Hitbox.GetCenter().y,
-            angle: this.Behaviour.GetAngle(),
-            sprites: this.Textures
-        }
-    }
     Mover: BasicMover;
     Hitbox: Rectangle;
     Health: FiniteHealth;
@@ -29,8 +22,18 @@ export class Goblin implements Enemy {
         this.Hitbox = new Rectangle(location, new Point(50, 50));
         this.Mover = new BasicMover(this.Hitbox);
         this.Health = new FiniteHealth(100);
+        this.Weapon = new NoopWeapon();
         this.Textures = {};
         this.Behaviour = new LooperBehaviour(players, this.Hitbox, this.Mover, this.Textures);
         this.ID = Id.get();
+    }
+
+    getDisplayInfo() {
+        return {
+            x: this.Hitbox.GetCenter().x,
+            y: this.Hitbox.GetCenter().y,
+            angle: this.Behaviour.GetAngle(),
+            sprites: this.Textures
+        }
     }
 }

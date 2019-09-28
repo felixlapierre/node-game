@@ -65,15 +65,21 @@ export class Area {
         this.players.forEach((player, socketID, map) => {
             player.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
 
-            payload.players[socketID] = player.GetDisplayInfo();
+            this.enemies.forEach((enemy) => {
+                player.Weapon.handleHit(enemy);
+            })
 
-            const playerCenter = player.Hitbox.GetCenter();
+            payload.players[socketID] = player.GetDisplayInfo();
             
-            io.sockets.connected[socketID].emit('returnPlayerState', {x:playerCenter.x, y:playerCenter.y, bag:{contents:player.Bag.contents}});
+            io.sockets.connected[socketID].emit('returnPlayerState', {bag:{contents:player.Bag.contents}});
         })
 
         this.enemies.forEach((enemy, ID) => {
             enemy.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
+
+            this.players.forEach((player) => {
+                enemy.Weapon.handleHit(player);
+            })
             payload.enemies[ID] = enemy.getDisplayInfo();
         })
 

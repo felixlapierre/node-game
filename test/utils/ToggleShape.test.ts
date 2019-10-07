@@ -3,7 +3,6 @@ import { createSandbox } from 'sinon'
 import * as sinonChai from 'sinon-chai';
 use(sinonChai);
 import { ToggleShape } from '../../src/my_modules/Utils/ToggleShape';
-import { Shape } from '../../src/my_modules/Utils/Geometry';
 
 describe('ToggleShape', () => {
     let sandbox = createSandbox();

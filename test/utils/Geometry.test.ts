@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Point, Rectangle, Circle } from '../src/my_modules/Utils/Geometry';
+import { Point, Rectangle, Circle } from '../../src/my_modules/Utils/Geometry';
 
 describe('Point', () => {
     describe('Point Overlap', () => {

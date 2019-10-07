@@ -1,9 +1,9 @@
-import { Player } from './player';
+import { Player } from './Creatures/Player';
 import { TextureMap, WallMap } from './map';
-import { wallCheck, boundsCheck } from './collision';
-import { Enemy } from './Enemies/Enemy';
-import { TargetDummy } from './Enemies/TargetDummy';
+import { Enemy } from './Creatures/Enemy';
+import { TargetDummy } from './Creatures/TargetDummy';
 import { Point } from './Utils/Geometry';
+import { Goblin } from './Creatures/Goblin';
 
 export class Area {
     private players: Map<string, Player>;
@@ -16,6 +16,7 @@ export class Area {
         this.players = new Map<string, Player>();
         this.enemies = new Map<string, Enemy>();
         this.addEnemy(new TargetDummy(new Point(50, 50)));
+        this.addEnemy(new Goblin(new Point(500, 500), this.players));
         Promise.all([
             TextureMap.load("./src/maps/" + ID + ".txt"),
             WallMap.load("./src/maps/" + ID + "_walls.txt")
@@ -33,6 +34,7 @@ export class Area {
     }
 
     newPlayer(playerId: string) {
+        // TODO: Inject special case EmptyWallMap.
         this.players.set(playerId, new Player(300, 300));
     }
 
@@ -52,7 +54,7 @@ export class Area {
         return this.players.size;
     }
 
-    update(elapsedTime: number, io: SocketIO.Server) {
+    update(elapsedTimeMilliseconds: number, io: SocketIO.Server) {
         if(!this.loaded)
             return;
         const payload = {
@@ -61,29 +63,23 @@ export class Area {
         };
 
         this.players.forEach((player, socketID, map) => {
-            player.update(elapsedTime);
-            const deltaT = elapsedTime / 1000;
+            player.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
 
-            let newCenter = player.getCenter();
-
-            if(player.intent.left) {newCenter.x -= 300 * deltaT;}
-            if(player.intent.up) {newCenter.y -= 300 * deltaT;}
-            if(player.intent.right) {newCenter.x += 300 * deltaT}
-            if(player.intent.down) {newCenter.y += 300 * deltaT;}
-    
-            // collision checks
-            newCenter = boundsCheck(newCenter.x, newCenter.y, this.wallMap.bounds);
-            newCenter = wallCheck(this.wallMap.tiles, newCenter.x, newCenter.y);
-
-            player.setCenter(newCenter);
+            this.enemies.forEach((enemy) => {
+                player.Weapon.handleHit(enemy);
+            })
 
             payload.players[socketID] = player.GetDisplayInfo();
-
-            io.sockets.connected[socketID].emit('returnPlayerState', {x:newCenter.x, y:newCenter.y, bag:{contents:player.bag.contents}});
+            
+            io.sockets.connected[socketID].emit('returnPlayerState', {bag:{contents:player.Bag.contents}});
         })
 
         this.enemies.forEach((enemy, ID) => {
-            enemy.Update(elapsedTime);
+            enemy.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
+
+            this.players.forEach((player) => {
+                enemy.Weapon.handleHit(player);
+            })
             payload.enemies[ID] = enemy.getDisplayInfo();
         })
 
@@ -92,12 +88,6 @@ export class Area {
 
     setPlayerIntent(playerID: string, data: any) {
         const player = this.players.get(playerID);
-		player.intent.left = data.left;
-		player.intent.right = data.right;
-		player.intent.up = data.up;
-		player.intent.down = data.down;
-		player.intent.click = data.click;
-		player.angle = data.angle;
-        player.bag.selected = data.selected;
+		player.Behaviour.SetIntent(data);
     }
 }

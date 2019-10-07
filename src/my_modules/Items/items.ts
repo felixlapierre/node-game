@@ -1,5 +1,5 @@
-import { Rectangle, Point } from './Utils/Geometry';
-import { Sprite } from './Sprite';
+import { Rectangle, Point } from '../Utils/Geometry';
+import { Sprite } from '../Sprite';
 
 export abstract class Item {
   GUID: number

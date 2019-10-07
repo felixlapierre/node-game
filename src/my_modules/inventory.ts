@@ -1,4 +1,4 @@
-import { Item } from './items';
+import { Item } from './Items/items';
 /*
 Bag is an array with 9 items visible on screen
 Selection item index is determined by 'selected' and changes with scroll

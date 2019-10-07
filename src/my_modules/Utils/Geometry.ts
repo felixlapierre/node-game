@@ -1,4 +1,6 @@
 export interface Shape {
+    SetCenter(center: Point);
+    GetCenter(): Point
     Overlaps(shape: Shape): boolean;
 }
 
@@ -16,6 +18,13 @@ class NoOverlapFunctionFoundError extends Error {
 
 export class Point implements Shape {
     constructor(public x: number, public y: number) { }
+
+    GetCenter() { return this; }
+
+    SetCenter(center: Point) {
+        this.x = center.x;
+        this.y = center.y;
+    }
 
     Overlaps(shape: Shape) {
         if (shape instanceof Point) {
@@ -48,6 +57,18 @@ function PointRectangleOverlap(point: Point, rectangle: Rectangle) {
 
 export class Rectangle implements Shape {
     constructor(public corner: Point, public size: Point) { }
+
+    SetCenter(center: Point) {
+        this.corner.x = center.x - this.size.x / 2;
+        this.corner.y = center.y - this.size.y / 2;
+    }
+
+    GetCenter() {
+        return new Point(
+            this.corner.x + this.size.x / 2,
+            this.corner.y + this.size.y / 2
+        )
+    }
 
     Overlaps(shape: Shape) {
         if (shape instanceof Point) {
@@ -90,6 +111,9 @@ function RectangleRectangleOverlap(r1: Rectangle, r2: Rectangle) {
 export class Circle implements Shape {
     constructor(public center: Point, public radius: number) { }
 
+    GetCenter() { return this.center };
+    SetCenter(center: Point) { this.center = center}
+
     Overlaps(shape: Shape) {
         if (shape instanceof Point) {
             return PointCircleOverlap(shape, this);
@@ -125,4 +149,36 @@ function CircleRectangleOverlap(circle: Circle, rectangle: Rectangle) {
         closest.y = rectangle.Top();
 
     return PointCircleOverlap(closest, circle);
+}
+
+export class Vector {
+    constructor(public x: number, public y: number) { }
+
+    Add(vector: Vector) {
+        this.x += vector.x;
+        this.y += vector.y;
+    }
+
+    Subtract(vector: Vector) {
+        this.x -= vector.x;
+        this.y -= vector.y;
+    }
+
+    Multiply(amount: number) {
+        this.x *= amount;
+        this.y *= amount;
+    }
+
+    GetLength() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+
+    Normalize() {
+        const length = this.GetLength();
+        if(length === 0) {
+            throw new Error("Attempted to normalize the null vector");
+        }
+        this.x /= length;
+        this.y /= length;
+    }
 }

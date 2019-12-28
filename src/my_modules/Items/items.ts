@@ -104,21 +104,3 @@ export class Sword extends Weapon {
     }
   }
 }
-
-export class PlayerLockedTexture {
-  constructor(
-    public sprite: any,
-    public source: Rectangle,
-    public dest: Rectangle,
-    public angle: number,
-    public rotateWithPlayer: boolean) {
-  }
-}
-/*
-  TODO:
-  Using an item
-  Left clicking will cause a different effect depending on the TYPE of the item
-
-  key     => will unlock interactable if within range (to open must use right click)
-  potion  => will consume, increase HP & invoke removeOne()
-*/

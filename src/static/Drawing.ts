@@ -1,12 +1,12 @@
 import { SpriteTable } from "./SpriteTable";
-import { ClientStorage } from "./ClientStorage";
+import { ClientStorage, LocalCreatureInfo } from "./ClientStorage";
 import { Input } from "./Input";
 const TILE_SIZE = 50;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 
 const itemBar = new Image();
-itemBar.src = "static/ItemBar.png";
+itemBar.src = "static/images/ItemBar.png";
 
 export interface Html5Canvas extends HTMLElement {
   width: number;
@@ -139,7 +139,7 @@ export class Drawing {
     }
   }
 
-  drawCreature(player) {
+  drawCreature(player: LocalCreatureInfo) {
     for (var id in player.creature.sprites) {
       const sprite = player.creature.sprites[id];
       if (player.animations.has(id)) {
@@ -162,7 +162,7 @@ export class Drawing {
     }
   }
 
-  drawSpriteRelativeToPlayer(player, sprite: Sprite) {
+  drawSpriteRelativeToPlayer(player: LocalCreatureInfo, sprite: Sprite) {
     this.canvasContext.save();
     this.canvasContext.translate(
       player.creature.x - this.clientStorage.topleft.x,

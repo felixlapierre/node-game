@@ -23,7 +23,7 @@ export class Socket {
 
     saveMapData(data) {
         this.clientStorage.map = data;
-        this.clientStorage.spritesheet.src = "static/" + data.spritesheet;
+        this.clientStorage.spritesheet.src = "static/images/" + data.spritesheet;
     }
 
     savePlayerId(id) {

@@ -1,11 +1,11 @@
 var playerImage = new Image();
-playerImage.src = "static/playerSprite1.png";
+playerImage.src = "static/images/playerSprite1.png";
 
 var targetDummy = new Image();
-targetDummy.src = "static/TargetDummy.png";
+targetDummy.src = "static/images/TargetDummy.png";
 
 var slash = new Image();
-slash.src = "static/Slash.png";
+slash.src = "static/images/Slash.png";
 
 export const SpriteTable = {
   Player: {

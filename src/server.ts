@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as socketIO from 'socket.io';
 
 //My module Dependencies
-import * as World from './my_modules/World';
+import * as World from './backend/World';
 
 //
 // Set Up Server

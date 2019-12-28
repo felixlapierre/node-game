@@ -1,5 +1,5 @@
 import { Input } from "./Input";
-import { ClientStorage, AnimationInfo } from "./ClientStorage";
+import { ClientStorage, AnimationInfo, LocalCreatureInfo, Creature } from "./ClientStorage";
 
 export class Socket {
     socket: SocketIOClient.Socket;
@@ -26,7 +26,7 @@ export class Socket {
         this.clientStorage.spritesheet.src = "static/images/" + data.spritesheet;
     }
 
-    savePlayerId(id) {
+    savePlayerId(id: string) {
         this.clientStorage.playerId = id;
     }
 
@@ -46,7 +46,7 @@ export class Socket {
         this.updateCamera();
     }
 
-    addOrUpdateCreature(id, creature) {
+    addOrUpdateCreature(id: string, creature: Creature) {
         const creatures = this.clientStorage.creatures;
         if (creatures.has(id)) {
             creatures.get(id).creature = creature;

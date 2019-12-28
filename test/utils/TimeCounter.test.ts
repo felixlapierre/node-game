@@ -3,8 +3,8 @@ import { createSandbox } from 'sinon'
 import * as sinonChai from 'sinon-chai';
 use(sinonChai);
 
-import {TimeCounter} from './../../src/my_modules/Utils/TimeCounter';
-import {TimeSubject} from './../../src/my_modules/Utils/TimeSubject';
+import {TimeCounter} from './../../src/backend/Utils/TimeCounter';
+import {TimeSubject} from './../../src/backend/Utils/TimeSubject';
 
 describe('TimeCounter', () => {
     let sandbox = createSandbox();

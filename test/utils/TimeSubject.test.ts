@@ -3,7 +3,7 @@ import { createSandbox } from 'sinon'
 import * as sinonChai from 'sinon-chai';
 use(sinonChai);
 
-import { TimeSubject } from '../../src/my_modules/Utils/TimeSubject';
+import { TimeSubject } from '../../src/backend/Utils/TimeSubject';
 
 describe('TimeSubject', () => {
     let sandbox = createSandbox();

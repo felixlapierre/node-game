@@ -3,7 +3,7 @@ import { createSandbox } from 'sinon'
 import * as sinonChai from 'sinon-chai';
 use(sinonChai);
 
-import { Counter } from '../../src/my_modules/Utils/Counter';
+import { Counter } from '../../src/backend/Utils/Counter';
 
 describe('Counter', () => {
     let sandbox = createSandbox();

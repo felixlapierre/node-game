@@ -9,6 +9,6 @@
         "./src/**/*"
     ],
     "exclude": [
-        "./src/static/**/*"
+        "src/frontend/**/*"
     ]
 }

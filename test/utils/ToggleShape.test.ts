@@ -2,7 +2,7 @@ import { expect, use } from 'chai';
 import { createSandbox } from 'sinon'
 import * as sinonChai from 'sinon-chai';
 use(sinonChai);
-import { ToggleShape } from '../../src/my_modules/Utils/ToggleShape';
+import { ToggleShape } from '../../src/backend/Utils/ToggleShape';
 
 describe('ToggleShape', () => {
     let sandbox = createSandbox();

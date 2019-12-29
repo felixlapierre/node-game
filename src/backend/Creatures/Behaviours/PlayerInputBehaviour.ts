@@ -30,9 +30,9 @@ export class PlayerInputBehaviour implements Behaviour {
         selected: 0
     }
 
-    constructor(private bag: Bag, private Textures: any, private Mover: Mover, private Weapon: Weapon) {
+    constructor(public Bag: Bag, private Textures: any, private Mover: Mover, private Weapon: Weapon) {
         this.Textures.self = new Sprite(0, 0, 0, 'Player', 'standing');
-        this.bag.contents[0] = new Sword();
+        this.Bag.contents[0] = new Sword();
     }
 
     Update(elapsedMilliseconds: number, wallMap: WallMap) {
@@ -52,8 +52,8 @@ export class PlayerInputBehaviour implements Behaviour {
 
         this.Mover.Update(elapsedSeconds, wallMap);
 
-        for (var i in this.bag.contents) {
-            this.bag.contents[i].update(parseInt(i) == this.bag.selected, this.intent.click, elapsedMilliseconds, this.Textures);
+        for (var i in this.Bag.contents) {
+            this.Bag.contents[i].update(parseInt(i) == this.Bag.selected, this.intent.click, elapsedMilliseconds, this.Textures);
         }
         if (this.intent.left || this.intent.right || this.intent.up || this.intent.down) {
             this.Textures.self.animation = 'walking';
@@ -64,7 +64,7 @@ export class PlayerInputBehaviour implements Behaviour {
 
     SetIntent(intent: Intent) {
         this.intent = intent;
-        this.bag.selected = intent.selected;
+        this.Bag.selected = intent.selected;
     }
 
     GetAngle() { return this.intent.angle }

@@ -1,22 +1,22 @@
 import { Behaviour } from "./Behaviour";
 import { Sprite } from "../../Sprite";
-import { Player } from "../Player";
 import { Mover } from "../Movers/Mover";
 import { Shape, Distance, Vector } from "../../Utils/Geometry";
+import { Creature } from "../Creature";
 
 const pixelsTraveledPerSecond = 350;
 
 export class LooperBehaviour implements Behaviour {
     private angle: number = 0;
 
-    constructor(private players: Map<string, Player>, private hitbox: Shape, private mover: Mover, private Textures: any) {
+    constructor(private players: Map<string, Creature>, private hitbox: Shape, private mover: Mover, private Textures: any) {
         this.Textures.self = new Sprite(0, 0, 0, 'Player', 'standing');
     }
 
     Update(elapsedMilliseconds: number, wallMap: import("../../map").WallMap): void {
         const elapsedSeconds = elapsedMilliseconds / 1000;
         // Get closest player
-        let closest: Player;
+        let closest: Creature;
         let closestDistance: number;
 
         this.players.forEach((player) => {

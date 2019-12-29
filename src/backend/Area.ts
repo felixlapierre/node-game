@@ -1,22 +1,28 @@
-import { Player } from './Creatures/Player';
 import { TextureMap, WallMap } from './map';
-import { Enemy } from './Creatures/Enemy';
-import { TargetDummy } from './Creatures/TargetDummy';
 import { Point } from './Utils/Geometry';
-import { Goblin } from './Creatures/Goblin';
+import { Creature } from './Creatures/Creature';
+import { TargetDummyBuilder } from './Creatures/TargetDummy';
+import { GoblinBuilder } from './Creatures/Goblin';
+import { PlayerBuilder } from './Creatures/Player';
+import { PlayerInputBehaviour } from './Creatures/Behaviours/PlayerInputBehaviour';
 
 export class Area {
-    private players: Map<string, Player>;
-    private enemies: Map<string, Enemy>;
+    private players: Map<string, PlayerInputBehaviour>;
+    private creatures: Map<string, Creature>;
+
+    //Maps socket ID to player ID
+    private playerIdMap: Map<string, string>;
+
     public textureMap: TextureMap;
     private wallMap: WallMap;
     public loaded: boolean;
 
     constructor(public ID, onLoad) {
-        this.players = new Map<string, Player>();
-        this.enemies = new Map<string, Enemy>();
-        this.addEnemy(new TargetDummy(new Point(50, 50)));
-        this.addEnemy(new Goblin(new Point(500, 500), this.players));
+        this.players = new Map<string, PlayerInputBehaviour>();
+        this.creatures = new Map<string, Creature>();
+        this.playerIdMap = new Map<string, string>();
+        this.addEnemy(TargetDummyBuilder.CreateTargetDummy(new Point(50, 50)));
+        this.addEnemy(GoblinBuilder.CreateGoblin(new Point(500, 500), this.creatures));
         Promise.all([
             TextureMap.load("./src/maps/" + ID + ".txt"),
             WallMap.load("./src/maps/" + ID + "_walls.txt")
@@ -33,21 +39,25 @@ export class Area {
           });
     }
 
-    newPlayer(playerId: string) {
+    newPlayer(socketId: string) {
         // TODO: Inject special case EmptyWallMap.
-        this.players.set(playerId, new Player(300, 300));
+        const playerData = PlayerBuilder.CreatePlayer(300, 300);
+        const player = playerData.Player;
+
+        this.players.set(socketId, playerData.Behaviour);
+        this.creatures.set(player.ID, player);
+
+        this.playerIdMap.set(socketId, player.ID);
     }
 
-    addPlayer(playerId: string, player: Player) {
-        this.players.set(playerId, player);
+    addEnemy(enemy: Creature) {
+        this.creatures.set(enemy.ID, enemy);
     }
 
-    addEnemy(enemy: Enemy) {
-        this.enemies.set(enemy.ID, enemy);
-    }
-
-    removePlayer(playerId: string) {
-        this.players.delete(playerId);
+    removePlayer(socketId: string) {
+        this.players.delete(socketId);
+        this.creatures.delete(this.playerIdMap.get(socketId));
+        this.playerIdMap.delete(socketId);
     }
 
     isEmpty() {
@@ -63,24 +73,16 @@ export class Area {
         };
 
         this.players.forEach((player, socketID, map) => {
-            player.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
-
-            this.enemies.forEach((enemy) => {
-                player.Weapon.handleHit(enemy);
-            })
-
-            payload.players[socketID] = player.GetDisplayInfo();
-            
             io.sockets.connected[socketID].emit('returnPlayerState', {bag:{contents:player.Bag.contents}});
         })
 
-        this.enemies.forEach((enemy, ID) => {
-            enemy.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
+        this.creatures.forEach((creature, ID) => {
+            creature.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
 
-            this.players.forEach((player) => {
-                enemy.Weapon.handleHit(player);
+            this.creatures.forEach((otherCreature) => {
+                creature.Weapon.handleHit(otherCreature);
             })
-            payload.enemies[ID] = enemy.getDisplayInfo();
+            payload.enemies[ID] = creature.GetDisplayInfo();
         })
 
         io.to(this.ID).emit('areaState', payload);
@@ -88,6 +90,6 @@ export class Area {
 
     setPlayerIntent(playerID: string, data: any) {
         const player = this.players.get(playerID);
-		player.Behaviour.SetIntent(data);
+		player.SetIntent(data);
     }
 }

@@ -62,8 +62,8 @@ function newPlayer(socket) {
 		//Send the player the map data
 		if (io.sockets.connected[socket.id]) {
 			io.sockets.connected[socket.id].emit('mapdata', World.getAreaOfSocketID(socketID).textureMap);
-			io.sockets.connected[socket.id].emit('identity', socket.id);
-			console.log("New player on socket " + socket.id);
+            io.sockets.connected[socket.id].emit('identity', socket.id);
+            console.log("New player on socket " + socket.id);
 		}
 	});
 }

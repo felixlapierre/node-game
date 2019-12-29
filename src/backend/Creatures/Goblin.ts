@@ -1,39 +1,26 @@
-import { Enemy } from "./Enemy";
 import { BasicMover } from "./Movers/Mover";
 import { Rectangle, Point } from "../Utils/Geometry";
 import { FiniteHealth } from "./Health";
-import { Weapon } from "../Items/Weapon";
-import { StraightRunBehaviour } from "./Behaviours/StraightRunBehaviour";
-import { Player } from "./Player";
-import { Id } from "../Id";
 import { LooperBehaviour } from "./Behaviours/LooperBehaviour";
 import { NoopWeapon } from "../Items/NoopWeapon";
+import { Creature, CreatureArgs } from "./Creature";
 
-export class Goblin implements Enemy {
-    ID: string;
-    Mover: BasicMover;
-    Hitbox: Rectangle;
-    Health: FiniteHealth;
-    Weapon: Weapon;
-    Behaviour: LooperBehaviour;
-    Textures: any;
+export class GoblinBuilder {
 
-    constructor(location: Point, players: Map<string, Player>) {
-        this.Hitbox = new Rectangle(location, new Point(50, 50));
-        this.Mover = new BasicMover(this.Hitbox);
-        this.Health = new FiniteHealth(100);
-        this.Weapon = new NoopWeapon();
-        this.Textures = {};
-        this.Behaviour = new LooperBehaviour(players, this.Hitbox, this.Mover, this.Textures);
-        this.ID = Id.get();
-    }
+    public static CreateGoblin(location: Point, players: Map<string, Creature>) {        
+        const hitbox = new Rectangle(location, new Point(50, 50));
+        const mover = new BasicMover(hitbox);
+        const textures = {};
 
-    getDisplayInfo() {
-        return {
-            x: this.Hitbox.GetCenter().x,
-            y: this.Hitbox.GetCenter().y,
-            angle: this.Behaviour.GetAngle(),
-            sprites: this.Textures
+        const args: CreatureArgs = {
+            Hitbox: hitbox,
+            Mover: mover,
+            Health: new FiniteHealth(100),
+            Weapon: new NoopWeapon(),
+            Textures: textures,
+            Behaviour: new LooperBehaviour(players, hitbox, mover, textures)
         }
+
+        return new Creature(args);
     }
 }

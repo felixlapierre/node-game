@@ -1,36 +1,39 @@
 import { Point, Rectangle, Shape } from '../Utils/Geometry';
-import { Creature } from './Creature';
+import { Creature, CreatureArgs } from './Creature';
 import { BasicMover } from './Movers/Mover';
 import { FiniteHealth } from './Health';
-import { Weapon, InventoryWeapon } from '../Items/Weapon';
+import { InventoryWeapon } from '../Items/Weapon';
 import { Bag } from '../inventory';
 import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
 
-export class Player implements Creature {
-    public Hitbox: Shape
-    public Mover: BasicMover
-    public Health: FiniteHealth
-    public Weapon: Weapon;
-    public Textures: any;
-    public Behaviour: PlayerInputBehaviour;
-    public Bag: Bag;
+export class PlayerBuilder {
+    private static playerSize = 50;
 
-    constructor(x: number, y: number) {
-        this.Hitbox = new Rectangle(new Point(x, y), new Point(50, 50));
-        this.Mover = new BasicMover(this.Hitbox);
-        this.Health = new FiniteHealth(100);
-        this.Bag = new Bag();
-        this.Weapon = new InventoryWeapon(this.Bag);
-        this.Textures = {};
-        this.Behaviour = new PlayerInputBehaviour(this.Bag, this.Textures, this.Mover, this.Weapon);
-    }
+    static CreatePlayer(x: number, y: number): CreatePlayerReturnData {
+        const hitbox = new Rectangle(new Point(x, y), new Point(this.playerSize, this.playerSize));
+        const mover = new BasicMover(hitbox);
+        const health = new FiniteHealth(100);
+        const bag = new Bag();
+        const weapon = new InventoryWeapon(bag);
+        const textures = {};
+        const behaviour = new PlayerInputBehaviour(bag, textures, mover, weapon);
 
-    GetDisplayInfo() {
-        return {
-            x: this.Hitbox.GetCenter().x,
-            y: this.Hitbox.GetCenter().y,
-            angle: this.Behaviour.intent.angle,
-            sprites: this.Textures
+        const args: CreatureArgs = {
+            Hitbox: hitbox,
+            Mover: mover,
+            Health: health,
+            Behaviour: behaviour,
+            Weapon: weapon,
+            Textures: textures
         }
+
+        const player = new Creature(args);
+
+        return {Player: player, Behaviour: behaviour};
     }
+}
+
+export interface CreatePlayerReturnData {
+    Player: Creature,
+    Behaviour: PlayerInputBehaviour
 }

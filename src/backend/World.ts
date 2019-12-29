@@ -43,12 +43,6 @@ export function removePlayer(socketID) {
   delete socket_rooms[socketID];
 }
 
-export function updateAllAreas(elapsedTimeMilliseconds: number) {
-  areas.forEach((area, ID, map) => {
-    area.update(elapsedTimeMilliseconds);
-  })
-}
-
 export function onPlayerIntentChanged(data, playerID: string) {
   const area = areas.get(socket_rooms[playerID]);
   if(area) {

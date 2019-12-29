@@ -2,7 +2,7 @@ import { Point, Rectangle, Shape } from '../Utils/Geometry';
 import { Creature, CreatureArgs } from './Creature';
 import { BasicMover } from './Movers/Mover';
 import { FiniteHealth } from './Health';
-import { InventoryWeapon } from '../Items/Weapon';
+import { InventoryWeapon } from '../Items/InventoryWeapon';
 import { Bag } from '../inventory';
 import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
 import { Team } from './Team';

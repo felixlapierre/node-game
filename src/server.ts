@@ -9,6 +9,7 @@ import * as socketIO from 'socket.io';
 //My module Dependencies
 import * as World from './backend/World';
 import { SocketFacade } from './backend/SocketFacade';
+import { TimeSubject } from './backend/Utils/TimeSubject';
 
 //
 // Set Up Server
@@ -77,8 +78,8 @@ setInterval(function () {
 	//Limit elapsed milliseconds 
 	if(timeElapsedMilliseconds > 10) {
 		timeElapsedMilliseconds = 10;
-	}
-
-	//Update every player in every area
-	World.updateAllAreas(timeElapsedMilliseconds);
+    }
+    
+    //Tell time subject to notify all observers that time has elapsed
+    TimeSubject.GetInstance().TimeElapsed(timeElapsedMilliseconds);
 }, 1000 / 60);

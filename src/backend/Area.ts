@@ -6,8 +6,9 @@ import { GoblinBuilder } from './Creatures/Goblin';
 import { PlayerBuilder } from './Creatures/Player';
 import { PlayerInputBehaviour } from './Creatures/Behaviours/PlayerInputBehaviour';
 import { SocketFacade } from './SocketFacade';
+import { TimeObserver, TimeSubject } from './Utils/TimeSubject';
 
-export class Area {
+export class Area implements TimeObserver{
     private players: Map<string, PlayerInputBehaviour>;
     private creatures: Map<string, Creature>;
 
@@ -38,6 +39,8 @@ export class Area {
                 onLoad(id);
             })
           });
+
+        TimeSubject.GetInstance().Register(this);
     }
 
     newPlayer(socketId: string) {
@@ -66,7 +69,7 @@ export class Area {
         return this.players.size;
     }
 
-    update(elapsedTimeMilliseconds: number) {
+    OnTimeElapsed(elapsedTimeMilliseconds: number) {
         if(!this.loaded)
             return;
         const payload = {};

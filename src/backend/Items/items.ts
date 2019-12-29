@@ -20,7 +20,7 @@ export abstract class Weapon extends Item {
     this.state = defaultState;
   }
 
-  update(selected, click, elapsedTime, textures) {
+  update(selected: boolean, click: boolean, elapsedTime: number, textures) {
     this.timeInState += elapsedTime;
     this.updateState(selected, click, elapsedTime); //Define this method in derived class
     textures[this.GUID] = this.createTextureFromState(); //Define this method in derived class

@@ -5,6 +5,7 @@ import { TargetDummyBuilder } from './Creatures/TargetDummy';
 import { GoblinBuilder } from './Creatures/Goblin';
 import { PlayerBuilder } from './Creatures/Player';
 import { PlayerInputBehaviour } from './Creatures/Behaviours/PlayerInputBehaviour';
+import { SocketFacade } from './SocketFacade';
 
 export class Area {
     private players: Map<string, PlayerInputBehaviour>;
@@ -48,6 +49,7 @@ export class Area {
         this.creatures.set(player.ID, player);
 
         this.playerIdMap.set(socketId, player.ID);
+        SocketFacade.GetInstance().SendToSocket(socketId, 'identity', player.ID);
     }
 
     addEnemy(enemy: Creature) {
@@ -64,7 +66,7 @@ export class Area {
         return this.players.size;
     }
 
-    update(elapsedTimeMilliseconds: number, io: SocketIO.Server) {
+    update(elapsedTimeMilliseconds: number) {
         if(!this.loaded)
             return;
         const payload = {
@@ -73,7 +75,7 @@ export class Area {
         };
 
         this.players.forEach((player, socketID, map) => {
-            io.sockets.connected[socketID].emit('returnPlayerState', {bag:{contents:player.Bag.contents}});
+            SocketFacade.GetInstance().SendToSocket(socketID, 'returnPlayerState', {bag:{contents:player.Bag.contents}});
         })
 
         this.creatures.forEach((creature, ID) => {
@@ -85,7 +87,7 @@ export class Area {
             payload.enemies[ID] = creature.GetDisplayInfo();
         })
 
-        io.to(this.ID).emit('areaState', payload);
+        SocketFacade.GetInstance().SendToArea(this.ID, 'areaState', payload);
     }
 
     setPlayerIntent(playerID: string, data: any) {

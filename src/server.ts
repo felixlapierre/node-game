@@ -8,6 +8,7 @@ import * as socketIO from 'socket.io';
 
 //My module Dependencies
 import * as World from './backend/World';
+import { SocketFacade } from './backend/SocketFacade';
 
 //
 // Set Up Server
@@ -15,8 +16,7 @@ import * as World from './backend/World';
 
 var app = express();
 var server = new http.Server(app);
-var io = socketIO(server);
-
+SocketFacade.Initialize(socketIO(server));
 var portNumber = 5000;
 
 app.set('port', portNumber);
@@ -36,8 +36,7 @@ server.listen(portNumber, function () {
 //
 // Websocket handlers
 //
-io.on('connection', function (socket) {
-
+SocketFacade.GetInstance().OnConnection(function (socket) {
 	socket.on('new player', function () {
 		newPlayer(socket);
 	});
@@ -59,12 +58,9 @@ io.on('connection', function (socket) {
 
 function newPlayer(socket) {
 	World.moveSocketTo(socket, 'default', function (socketID) {
-		//Send the player the map data
-		if (io.sockets.connected[socket.id]) {
-			io.sockets.connected[socket.id].emit('mapdata', World.getAreaOfSocketID(socketID).textureMap);
-            io.sockets.connected[socket.id].emit('identity', socket.id);
-            console.log("New player on socket " + socket.id);
-		}
+        //Send the player the map data
+        SocketFacade.GetInstance().SendToSocket(socket.id, 'mapdata', World.getAreaOfSocketID(socketID).textureMap);
+        console.log("New player on socket " + socket.id);
 	});
 }
 
@@ -84,5 +80,5 @@ setInterval(function () {
 	}
 
 	//Update every player in every area
-	World.updateAllAreas(timeElapsedMilliseconds, io);
+	World.updateAllAreas(timeElapsedMilliseconds);
 }, 1000 / 60);

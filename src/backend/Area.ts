@@ -69,10 +69,7 @@ export class Area {
     update(elapsedTimeMilliseconds: number) {
         if(!this.loaded)
             return;
-        const payload = {
-            players: {},
-            enemies: {}
-        };
+        const payload = {};
 
         this.players.forEach((player, socketID, map) => {
             SocketFacade.GetInstance().SendToSocket(socketID, 'returnPlayerState', {bag:{contents:player.Bag.contents}});
@@ -84,7 +81,7 @@ export class Area {
             this.creatures.forEach((otherCreature) => {
                 creature.Weapon.handleHit(otherCreature);
             })
-            payload.enemies[ID] = creature.GetDisplayInfo();
+            payload[ID] = creature.GetDisplayInfo();
         })
 
         SocketFacade.GetInstance().SendToArea(this.ID, 'areaState', payload);

@@ -35,12 +35,8 @@ export class Socket {
     }
 
     saveState(state) {
-        for (var id in state.players) {
-            this.addOrUpdateCreature(id, state.players[id]);
-        }
-
-        for (var id in state.enemies) {
-            this.addOrUpdateCreature(id, state.enemies[id]);
+        for (var id in state) {
+            this.addOrUpdateCreature(id, state[id]);
         }
 
         this.updateCamera();

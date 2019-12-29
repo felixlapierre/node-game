@@ -3,13 +3,14 @@ import { Shape, Distance, Vector } from "../../Utils/Geometry";
 import { Mover } from "../Movers/Mover";
 import { Sprite } from "../../Sprite";
 import { Creature } from "../Creature";
+import { Team } from "../Team";
 
 const pixelsTraveledPerSecond = 350;
 
 export class StraightRunBehaviour implements Behaviour {
     private angle: number = 0;
 
-    constructor(private players: Map<string, Creature>, private hitbox: Shape, private mover: Mover, private Textures: any) {
+    constructor(private players: Map<string, Creature>, private hitbox: Shape, private mover: Mover, private Textures: any, private Team: Team) {
         this.Textures.self = new Sprite(0, 0, 0, 'Player', 'standing');
     }
 
@@ -20,6 +21,8 @@ export class StraightRunBehaviour implements Behaviour {
         let closestDistance: number;
 
         this.players.forEach((player) => {
+            if(player.Team == this.Team)
+                return;
             const distance = Distance(this.hitbox.GetCenter(), player.Hitbox.GetCenter());
             if (closest === undefined || distance < closestDistance) {
                 closest = player;

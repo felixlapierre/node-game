@@ -5,6 +5,7 @@ import { InfiniteHealth } from './Health';
 import { NoopBehaviour } from './Behaviours/NoopBehaviour';
 import { NoopWeapon } from '../Items/NoopWeapon';
 import { CreatureArgs, Creature } from './Creature';
+import { Team } from './Team';
 
 const size = new Point(50, 50);
 
@@ -19,7 +20,8 @@ export class TargetDummyBuilder {
             Textures: textures,
             Weapon: new NoopWeapon(),
             Health: new InfiniteHealth(),
-            Behaviour: new NoopBehaviour()
+            Behaviour: new NoopBehaviour(),
+            Team: Team.Enemies
         }
 
         return new Creature(args);

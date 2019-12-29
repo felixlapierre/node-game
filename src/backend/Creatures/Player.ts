@@ -5,6 +5,7 @@ import { FiniteHealth } from './Health';
 import { InventoryWeapon } from '../Items/Weapon';
 import { Bag } from '../inventory';
 import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
+import { Team } from './Team';
 
 export class PlayerBuilder {
     private static playerSize = 50;
@@ -24,7 +25,8 @@ export class PlayerBuilder {
             Health: health,
             Behaviour: behaviour,
             Weapon: weapon,
-            Textures: textures
+            Textures: textures,
+            Team: Team.Players
         }
 
         const player = new Creature(args);

@@ -25,6 +25,10 @@ export const SpriteTable = {
           { x: 150, y: 0 },
           { x: 200, y: 0 }
         ]
+      },
+      dead: {
+          delay: -1,
+          frames: [{x:0, y:50}]
       }
     }
   },

@@ -16,6 +16,7 @@ export class LooperBehaviour implements Behaviour {
 
     Update(elapsedMilliseconds: number, wallMap: import("../../map").WallMap): void {
         if(this.health.getCurrentHealth() <= 0) {
+            this.Textures.self.animation = "dead";
             return;
         }
         const elapsedSeconds = elapsedMilliseconds / 1000;

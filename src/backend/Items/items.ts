@@ -118,14 +118,15 @@ export class Sword extends Weapon {
 
   handleHit(target: Creature) {
       // Placeholder
-      if(target.Hitbox.Overlaps(this.hitbox)) {
-        target.Health.takeDamage(0);
+      if(target.Hitbox.Overlaps(this.hitbox)
+        && target.Health.isVulnerable()) {
+        target.Health.takeDamage(10);
         const targetCenter = target.Hitbox.GetCenter();
         const myCenter = this.hitbox.GetCenter();
         const knockDirection = new Vector(targetCenter.x - myCenter.x, targetCenter.y - myCenter.y);
         knockDirection.Normalize();
-        knockDirection.Multiply(100);
-        new Knockback(target, knockDirection, 500);
+        knockDirection.Multiply(2000);
+        new Knockback(target, knockDirection, 250);
       }
   }
 }

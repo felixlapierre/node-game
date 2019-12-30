@@ -12,7 +12,7 @@ export class InventoryWeapon implements Weapon {
         if(currentItem instanceof Sword) {
             const sword = currentItem as Sword;
             if(sword.state == "swinging") {
-                
+                sword.handleHit(creature);
             }
         }
     }

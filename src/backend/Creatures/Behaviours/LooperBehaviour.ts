@@ -4,17 +4,21 @@ import { Mover } from "../Movers/Mover";
 import { Shape, Distance, Vector } from "../../Utils/Geometry";
 import { Creature } from "../Creature";
 import { Team } from "../Team";
+import { Health } from "../Health";
 
 const pixelsTraveledPerSecond = 350;
 
 export class LooperBehaviour implements Behaviour {
     private angle: number = 0;
 
-    constructor(private creatures: Map<string, Creature>, private hitbox: Shape, private mover: Mover, private Textures: any, private Team: Team) {
+    constructor(private creatures: Map<string, Creature>, private hitbox: Shape, private mover: Mover, private health: Health, private Textures: any, private Team: Team) {
         this.Textures.self = new Sprite(0, 0, 0, 'Player', 'standing');
     }
 
     Update(elapsedMilliseconds: number, wallMap: import("../../map").WallMap): void {
+        if(this.health.getCurrentHealth() <= 0) {
+            return;
+        }
         const elapsedSeconds = elapsedMilliseconds / 1000;
         // Get closest player
         let closest: Creature;

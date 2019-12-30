@@ -1,10 +1,11 @@
-import { Shape, Vector } from "../../Utils/Geometry";
+import { Shape, Vector, Point } from "../../Utils/Geometry";
 import { boundsCheck, wallCheck } from "../../collision";
 import { WallMap } from "../../map";
 
 export interface Mover {
     Update(elapsedSeconds: number, wallMap: WallMap): void;
     SetVelocity(amount: Vector): void;
+    GetCenter(): Point;
 }
 
 export class BasicMover implements Mover {
@@ -29,6 +30,10 @@ export class BasicMover implements Mover {
         center = wallCheck(wallMap.tiles, center.x, center.y);
 
         this.position.SetCenter(center);
+    }
+
+    GetCenter(): Point {
+        return this.position.GetCenter();
     }
 
     SetVelocity(amount: Vector) {

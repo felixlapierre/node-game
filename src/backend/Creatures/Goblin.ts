@@ -11,16 +11,17 @@ export class GoblinBuilder {
     public static CreateGoblin(location: Point, players: Map<string, Creature>) {        
         const hitbox = new Rectangle(location, new Point(50, 50));
         const mover = new BasicMover(hitbox);
+        const health = new FiniteHealth(100);
         const textures = {};
         const team = Team.Enemies;
 
         const args: CreatureArgs = {
             Hitbox: hitbox,
             Mover: mover,
-            Health: new FiniteHealth(100),
+            Health: health,
             Weapon: new NoopWeapon(),
             Textures: textures,
-            Behaviour: new LooperBehaviour(players, hitbox, mover, textures, team),
+            Behaviour: new LooperBehaviour(players, hitbox, mover, health, textures, team),
             Team: team
         }
 

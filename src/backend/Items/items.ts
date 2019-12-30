@@ -1,5 +1,6 @@
-import { Rectangle, Point } from '../Utils/Geometry';
+import { Rectangle, Point, Circle, Shape, Vector } from '../Utils/Geometry';
 import { Sprite } from '../Sprite';
+import { Creature } from '../Creatures/Creature';
 
 export abstract class Item {
   GUID: number
@@ -51,11 +52,13 @@ const perfectSwingBack = 1500;
 export class Sword extends Weapon {
   maxdamage: number
   damageFactor: number
+  hitbox: Shape
   constructor() {
     super('Sword', 1, "sheathed");
     this.timeInState = 0;
     this.maxdamage = 30;
     this.damageFactor = 1;
+    this.hitbox = new Circle(new Point(0, 0), 10);
   }
 
   updateState(selected, click) {
@@ -102,5 +105,19 @@ export class Sword extends Weapon {
       case "swinging":
         return new Sprite(0, -30, 0, 'Slash', 'swinging');
     }
+  }
+
+  updateHitbox(creatureCenter: Point, creatureAngle: number) {
+    const direction = new Vector(Math.cos(creatureAngle), Math.sin(creatureAngle));
+    direction.Multiply(30);
+    const newCenter = new Point(creatureCenter.x + direction.x,
+        creatureCenter.y + direction.y);
+    this.hitbox.SetCenter(newCenter);
+  }
+
+  handleHit(target: Creature) {
+      // Placeholder
+      if(target.Hitbox.Overlaps(this.hitbox))
+        target.Health.takeDamage(100);
   }
 }

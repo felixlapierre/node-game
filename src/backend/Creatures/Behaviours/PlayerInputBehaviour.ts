@@ -52,6 +52,12 @@ export class PlayerInputBehaviour implements Behaviour {
 
         this.Mover.Update(elapsedSeconds, wallMap);
 
+        const firstItem = this.Bag.contents[0];
+        if(firstItem instanceof Sword) {
+            const sword = firstItem as Sword;
+            sword.updateHitbox(this.Mover.GetCenter(), this.GetAngle());
+        }
+
         for (var i in this.Bag.contents) {
             this.Bag.contents[i].update(parseInt(i) == this.Bag.selected, this.intent.click, elapsedMilliseconds, this.Textures);
         }

@@ -8,7 +8,7 @@ import { PlayerInputBehaviour } from './Creatures/Behaviours/PlayerInputBehaviou
 import { SocketFacade } from './SocketFacade';
 import { TimeObserver, TimeSubject } from './Utils/TimeSubject';
 
-export class Area implements TimeObserver{
+export class Area implements TimeObserver {
     private players: Map<string, PlayerInputBehaviour>;
     private creatures: Map<string, Creature>;
 
@@ -28,17 +28,17 @@ export class Area implements TimeObserver{
         Promise.all([
             TextureMap.load("./src/maps/" + ID + ".txt"),
             WallMap.load("./src/maps/" + ID + "_walls.txt")
-          ])
-          .then(([textureMap, wallMap]) => {
-            this.textureMap = textureMap;
-            this.wallMap = wallMap;
-            this.loaded = true;
-      
-            //Give the map to everyone in the room
-            this.players.forEach((player, id, map) => {
-                onLoad(id);
-            })
-          });
+        ])
+            .then(([textureMap, wallMap]) => {
+                this.textureMap = textureMap;
+                this.wallMap = wallMap;
+                this.loaded = true;
+
+                //Give the map to everyone in the room
+                this.players.forEach((player, id, map) => {
+                    onLoad(id);
+                })
+            });
 
         TimeSubject.GetInstance().Register(this);
     }
@@ -70,19 +70,21 @@ export class Area implements TimeObserver{
     }
 
     OnTimeElapsed(elapsedTimeMilliseconds: number) {
-        if(!this.loaded)
+        if (!this.loaded)
             return;
         const payload = {};
 
         this.players.forEach((player, socketID, map) => {
-            SocketFacade.GetInstance().SendToSocket(socketID, 'returnPlayerState', {bag:{contents:player.Bag.contents}});
+            SocketFacade.GetInstance().SendToSocket(socketID, 'returnPlayerState', { bag: { contents: player.Bag.contents } });
         })
 
         this.creatures.forEach((creature, ID) => {
             creature.Behaviour.Update(elapsedTimeMilliseconds, this.wallMap);
 
             this.creatures.forEach((otherCreature) => {
-                creature.Weapon.handleHit(otherCreature);
+                if (creature.Team != otherCreature.Team) {
+                    creature.Weapon.handleHit(otherCreature);
+                }
             })
             payload[ID] = creature.GetDisplayInfo();
         })
@@ -92,6 +94,6 @@ export class Area implements TimeObserver{
 
     setPlayerIntent(playerID: string, data: any) {
         const player = this.players.get(playerID);
-		player.SetIntent(data);
+        player.SetIntent(data);
     }
 }

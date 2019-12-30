@@ -5,13 +5,12 @@ import { Shape, Distance, Vector } from "../../Utils/Geometry";
 import { Creature } from "../Creature";
 import { Team } from "../Team";
 import { Health } from "../Health";
-
-const pixelsTraveledPerSecond = 350;
+import { BasicCreatureMover } from "../Movers/CreatureMover";
 
 export class LooperBehaviour implements Behaviour {
     private angle: number = 0;
 
-    constructor(private creatures: Map<string, Creature>, private hitbox: Shape, private mover: Mover, private health: Health, private Textures: any, private Team: Team) {
+    constructor(private creatures: Map<string, Creature>, private hitbox: Shape, private mover: BasicCreatureMover, private health: Health, private Textures: any, private Team: Team) {
         this.Textures.self = new Sprite(0, 0, 0, 'Player', 'standing');
     }
 
@@ -43,8 +42,6 @@ export class LooperBehaviour implements Behaviour {
 
             // Set magnitude to pixelsTraveledPerSecond.
             if (direction.GetLength() != 0) {
-                direction.Normalize();
-                direction.Multiply(pixelsTraveledPerSecond);
                 this.angle = Math.atan2(direction.x, direction.y);
             }
 
@@ -57,7 +54,7 @@ export class LooperBehaviour implements Behaviour {
             }
         }
 
-        this.mover.SetVelocity(direction);
+        this.mover.SetCreatureIntendedDirection(direction);
         this.mover.Update(elapsedSeconds, wallMap);
 
         if (direction.GetLength() != 0) {

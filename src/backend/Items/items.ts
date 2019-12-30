@@ -1,6 +1,7 @@
 import { Rectangle, Point, Circle, Shape, Vector } from '../Utils/Geometry';
 import { Sprite } from '../Sprite';
 import { Creature } from '../Creatures/Creature';
+import { Knockback } from '../Creatures/Movers/Knockback';
 
 export abstract class Item {
   GUID: number
@@ -117,7 +118,14 @@ export class Sword extends Weapon {
 
   handleHit(target: Creature) {
       // Placeholder
-      if(target.Hitbox.Overlaps(this.hitbox))
-        target.Health.takeDamage(100);
+      if(target.Hitbox.Overlaps(this.hitbox)) {
+        target.Health.takeDamage(0);
+        const targetCenter = target.Hitbox.GetCenter();
+        const myCenter = this.hitbox.GetCenter();
+        const knockDirection = new Vector(targetCenter.x - myCenter.x, targetCenter.y - myCenter.y);
+        knockDirection.Normalize();
+        knockDirection.Multiply(100);
+        new Knockback(target, knockDirection, 500);
+      }
   }
 }

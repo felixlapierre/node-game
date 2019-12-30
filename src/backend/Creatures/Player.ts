@@ -6,13 +6,15 @@ import { InventoryWeapon } from '../Items/InventoryWeapon';
 import { Bag } from '../inventory';
 import { PlayerInputBehaviour } from './Behaviours/PlayerInputBehaviour';
 import { Team } from './Team';
+import { BasicCreatureMover } from './Movers/CreatureMover';
+const pixelsTraveledPerSecond = 500;
 
 export class PlayerBuilder {
     private static playerSize = 50;
 
     static CreatePlayer(x: number, y: number): CreatePlayerReturnData {
         const hitbox = new Rectangle(new Point(x, y), new Point(this.playerSize, this.playerSize));
-        const mover = new BasicMover(hitbox);
+        const mover = new BasicCreatureMover(hitbox, pixelsTraveledPerSecond);
         const health = new FiniteHealth(100);
         const bag = new Bag();
         const weapon = new InventoryWeapon(bag);

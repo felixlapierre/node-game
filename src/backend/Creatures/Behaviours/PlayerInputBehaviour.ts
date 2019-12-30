@@ -6,8 +6,7 @@ import { Mover } from "../Movers/Mover";
 import { Vector } from "../../Utils/Geometry";
 import { Behaviour } from "./Behaviour";
 import { WallMap } from "../../map";
-
-const pixelsTraveledPerSecond = 500;
+import { BasicCreatureMover } from "../Movers/CreatureMover";
 
 export interface Intent {
     left: boolean,
@@ -30,7 +29,7 @@ export class PlayerInputBehaviour implements Behaviour {
         selected: 0
     }
 
-    constructor(public Bag: Bag, private Textures: any, private Mover: Mover, private Weapon: Weapon) {
+    constructor(public Bag: Bag, private Textures: any, private Mover: BasicCreatureMover, private Weapon: Weapon) {
         this.Textures.self = new Sprite(0, 0, 0, 'Player', 'standing');
         this.Bag.contents[0] = new Sword();
     }
@@ -44,11 +43,7 @@ export class PlayerInputBehaviour implements Behaviour {
         if (this.intent.right) { intentDirection.x += 1 }
         if (this.intent.down) { intentDirection.y += 1 }
 
-        if(intentDirection.GetLength() != 0) {
-            intentDirection.Normalize();
-            intentDirection.Multiply(pixelsTraveledPerSecond)
-        }
-        this.Mover.SetVelocity(intentDirection);
+        this.Mover.SetCreatureIntendedDirection(intentDirection);
 
         this.Mover.Update(elapsedSeconds, wallMap);
 

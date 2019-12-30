@@ -4,10 +4,12 @@ import { Entity, EntityArgs } from "./Entity";
 import { Shape } from "../Utils/Geometry";
 import { Mover } from "./Movers/Mover";
 import { Behaviour } from "./Behaviours/Behaviour";
+import { CreatureMover } from "./Movers/CreatureMover";
 
 export class Creature extends Entity {
     Health: Health
     Weapon: Weapon
+    Mover: CreatureMover
 
     constructor(args: CreatureArgs) {
         super(args);
@@ -18,5 +20,6 @@ export class Creature extends Entity {
 
 export interface CreatureArgs extends EntityArgs {
     Health: Health,
-    Weapon: Weapon
+    Weapon: Weapon,
+    Mover: CreatureMover
 }
